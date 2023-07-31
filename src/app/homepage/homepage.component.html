@@ -4,11 +4,14 @@
 </div>
 <div class="container">
 
-  <div class="input-file-container">
+  <div class="input-file-container" style="margin-bottom: 0px;">
     <input id="fileInput" type="file" (change)="handleFileInput($event)">
   </div>
 
-  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  <div class="error-space">
+    <span *ngIf="errorMessage" class="error">{{ errorMessage }}</span>
+  </div>
+
 
 <div style="display: flex; gap: 30px;">
 
@@ -37,13 +40,15 @@
     <div>
       <p style="margin: 0;font-weight: bolder">insert & delete</p>
     </div>
-    <div class="button-container">
+    <div class="button-container" style="margin-bottom: 0px;">
       <button class="button" (click)="insertCSVToDb()">Insert CSV to DB</button>
-      <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
     </div>
+    <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
     <div class="button-container" style="margin-bottom: 0px;">
       <button class="button" (click)="deleteAllFromDb()">Delete All</button>
+
     </div>
+    <p class="success" *ngIf="deleteSuccess">Data successfully deleted</p>
 <!--    HR HERE-->
     <div style="width: 100%; margin: -10px 10px;">
       <hr style="flex-grow: 0; flex-shrink: 0; flex-basis: 1px;">

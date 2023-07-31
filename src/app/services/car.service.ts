@@ -22,7 +22,7 @@ export class CarService {
 
   deleteAllFromDb() {
     const uploadUrl = `${this.BASE_URL}/h2/deleteAll`;
-    return this.http.delete(uploadUrl);
+    return this.http.delete(uploadUrl,{responseType: 'text'});
   }
 
   csvToPdfByYear(formData: FormData): Observable<any> {

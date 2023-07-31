@@ -43,6 +43,7 @@ body {
   align-items: center;
   width: 100%;
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .button {
@@ -70,6 +71,15 @@ body {
 .error {
   color: red;
   font-weight: bold;
+  font-size: 20pt;
+}
+
+
+.error-space {
+  height: 10px; /* or however tall you expect your error messages to be */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .success {
   color: green;

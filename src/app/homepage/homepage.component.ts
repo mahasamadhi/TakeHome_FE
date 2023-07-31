@@ -14,6 +14,8 @@ export class HomepageComponent {
   fileToUpload: File | null;
   errorMessage: string | null = null;
   uploadSuccess: boolean | null = null;
+  deleteSuccess: boolean | null = null;
+
 
   fileInputEl: HTMLInputElement | null = null;
 
@@ -104,9 +106,13 @@ export class HomepageComponent {
       },
       complete: () => {
         console.log('Request completed');
+        this.deleteSuccess = true;
+        setTimeout(() => {
+          this.deleteSuccess = null;
+        }, 3000);
+      }
+    });
 
-        }
-    })
   }
 
 
