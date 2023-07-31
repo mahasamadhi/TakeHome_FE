@@ -11,6 +11,14 @@ export class CarService {
 
   constructor(private http: HttpClient) { }
 
+  insertCsvToDb(formData: FormData): Observable<any> {
+    const uploadUrl = `${this.BASE_URL}/h2/insertCsv`;
+    return this.http.post(uploadUrl, formData, {
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
+
   csvToPdfByYear(formData: FormData): Observable<any> {
     const uploadUrl = `${this.BASE_URL}/report/csvToPdf/byYear`;
     return this.http.post(uploadUrl, formData, {

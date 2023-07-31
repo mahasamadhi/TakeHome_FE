@@ -3,7 +3,7 @@
 <div class="container">
   <h1 style="font-size: 28pt;font-family: Arial; font-style: italic;color: #000038">Car Report Generator</h1>
   <div class="input-file-container">
-    <input type="file" (change)="handleFileInput($event)">
+    <input id="fileInput" type="file" (change)="handleFileInput($event)">
   </div>
 
   <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
@@ -14,7 +14,7 @@
   <div id="fromCSV">
 
     <div class="inner-container">
-      <h1>From CSV file</h1>
+      <h1 class="sectionTitle">From CSV file</h1>
       <div class="button-container">
         <button class="button" (click)="csvToPdfByYear()">Get PDF By Year</button>
       </div>
@@ -27,7 +27,11 @@
     <!--from CSV input-->
 <div id="fromDB">
   <div class="inner-container">
-    <h1>From Database</h1>
+    <h1 class="sectionTitle">From Database</h1>
+    <div class="button-container">
+      <button class="button" (click)="insertCSVToDb()">Insert CSV to DB</button>
+      <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
+    </div>
     <div class="button-container">
       <button class="button" (click)="getAllFromDBByYear()">Get All from DB by Year</button>
     </div>

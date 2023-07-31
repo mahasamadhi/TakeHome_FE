@@ -13,10 +13,18 @@ export class HomepageComponent {
   yearControl = new FormControl('');
   fileToUpload: File | null;
   errorMessage: string | null = null;
+  uploadSuccess: boolean | null = null;
+
+  fileInputEl: HTMLInputElement | null = null;
 
   constructor(private http: HttpClient,private carService: CarService) {
     this.fileToUpload = null;
   }
+
+  ngOnInit(): void {
+    this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
+  }
+
 
   handleFileInput(event: Event) {
     if (this.fileToUpload) {
@@ -40,6 +48,35 @@ export class HomepageComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.csvToPdfByYear(formData).subscribe(this.getObserverForPdfDownload())
+    } else {
+      this.errorMessage = 'No file selected';
+    }
+  }
+
+  insertCSVToDb() {
+    if (this.fileToUpload) {
+      this.errorMessage = null;
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+      this.carService.insertCsvToDb(formData).subscribe({
+        next: (response: any) => {
+          console.log(response);
+        },
+        error: (error: any) => {
+          console.log('An error occurred:', error);
+        },
+        complete: () => {
+          console.log('Request completed');
+          this.uploadSuccess = true;
+          setTimeout(()=>{
+            this.uploadSuccess = null;
+          }, 3000)
+          this.fileToUpload = null;
+          if (this.fileInputEl) {
+            this.fileInputEl.value = '';
+          }
+        }
+      })
     } else {
       this.errorMessage = 'No file selected';
     }
