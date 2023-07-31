@@ -19,6 +19,12 @@ export class CarService {
     });
   }
 
+
+  deleteAllFromDb() {
+    const uploadUrl = `${this.BASE_URL}/h2/deleteAll`;
+    return this.http.delete(uploadUrl);
+  }
+
   csvToPdfByYear(formData: FormData): Observable<any> {
     const uploadUrl = `${this.BASE_URL}/report/csvToPdf/byYear`;
     return this.http.post(uploadUrl, formData, {

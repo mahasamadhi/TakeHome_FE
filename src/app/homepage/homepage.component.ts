@@ -94,6 +94,20 @@ export class HomepageComponent {
   }
 
 
+  deleteAllFromDb() {
+    this.carService.deleteAllFromDb().subscribe({
+      next: (response: any) => {
+        console.log(response);
+      },
+      error: (error: any) => {
+        console.log('An error occurred:', error);
+      },
+      complete: () => {
+        console.log('Request completed');
+
+        }
+    })
+  }
 
 
   getAllFromDBByYear() {

@@ -1,7 +1,9 @@
-
-
-<div class="container">
+<div class="titleHeader">
   <h1 style="font-size: 28pt;font-family: Arial; font-style: italic;color: #000038">Car Report Generator</h1>
+
+</div>
+<div class="container">
+
   <div class="input-file-container">
     <input id="fileInput" type="file" (change)="handleFileInput($event)">
   </div>
@@ -27,11 +29,30 @@
     <!--from CSV input-->
 <div id="fromDB">
   <div class="inner-container">
-    <h1 class="sectionTitle">From Database</h1>
+    <h1 class="sectionTitle">Database</h1>
+    <div style="width: 100%; margin: -10px 10px;">
+
+      <hr style="flex-grow: 0; flex-shrink: 0; flex-basis: 1px;">
+    </div>
+    <div>
+      <p style="margin: 0;font-weight: bolder">insert & delete</p>
+    </div>
     <div class="button-container">
       <button class="button" (click)="insertCSVToDb()">Insert CSV to DB</button>
       <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
     </div>
+    <div class="button-container" style="margin-bottom: 0px;">
+      <button class="button" (click)="deleteAllFromDb()">Delete All</button>
+    </div>
+<!--    HR HERE-->
+    <div style="width: 100%; margin: -10px 10px;">
+      <hr style="flex-grow: 0; flex-shrink: 0; flex-basis: 1px;">
+    </div>
+    <div>
+      <p style="margin: 0;font-weight: bolder">get by:</p>
+    </div>
+    <!--    HR HERE-->
+
     <div class="button-container">
       <button class="button" (click)="getAllFromDBByYear()">Get All from DB by Year</button>
     </div>
@@ -42,6 +63,8 @@
       <button class="button" (click)="selectByYear()">Select by Year</button>
       <input class="input" type="text" [formControl]="yearControl">
     </div>
+    <hr>
+
   </div>
 </div>
 
