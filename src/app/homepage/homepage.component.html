@@ -1,0 +1,47 @@
+
+
+<div class="container">
+  <h1 style="font-size: 28pt;font-family: Arial; font-style: italic;color: #000038">Car Report Generator</h1>
+  <div class="input-file-container">
+    <input type="file" (change)="handleFileInput($event)">
+  </div>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+<div style="display: flex; gap: 30px;">
+
+<!--from CSV input-->
+  <div id="fromCSV">
+
+    <div class="inner-container">
+      <h1>From CSV file</h1>
+      <div class="button-container">
+        <button class="button" (click)="csvToPdfByYear()">Get PDF By Year</button>
+      </div>
+
+      <div class="button-container">
+        <button class="button" (click)="csvToPdfByMake()">Get PDF By Make</button>
+      </div>
+  </div>
+  </div>
+    <!--from CSV input-->
+<div id="fromDB">
+  <div class="inner-container">
+    <h1>From Database</h1>
+    <div class="button-container">
+      <button class="button" (click)="getAllFromDBByYear()">Get All from DB by Year</button>
+    </div>
+    <div class="button-container">
+      <button class="button" (click)="getAllFromDBByMake()">Get All from DB by Make</button>
+    </div>
+    <div class="input-container">
+      <button class="button" (click)="selectByYear()">Select by Year</button>
+      <input class="input" type="text" [formControl]="yearControl">
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  </div>
+
