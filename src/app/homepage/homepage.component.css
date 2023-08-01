@@ -8,7 +8,7 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh; /* This makes the container take up the full height of the screen */
+  height: 100%; /* This makes the container take up the full height of the screen */
   gap: 20px;
 }
 
@@ -22,7 +22,7 @@ body {
   background: white;
   padding: 20px;
   border-radius: 10px; /* Rounded corners */
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.3); /* Small shadow for a "card" effect */
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.2); /* Small shadow for a "card" effect */
 }
 
 .sectionTitle {
@@ -47,7 +47,7 @@ body {
 }
 
 .button {
-  padding: 10px 20px;
+  padding: 10px 10px;
   background: #007bff;
   color: white;
   border: none;
@@ -89,9 +89,38 @@ body {
 .titleHeader{
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 hr {
   flex-grow: 0; flex-shrink: 0; flex-basis: 1px;
+}
+
+#queryParamsDiv{
+  /*border: black solid 1px;*/
+  /*height: 50%;*/
+  width: 300px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  /*gap: 15px;*/
+  background: white;
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.1); /* Small shadow for a "card" effect */
+}
+
+.queryParamsSelect{
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#filterVal{
+  margin-bottom: 20px;
+}
+
+#priceFilter{
+  margin-bottom: 20px;
+  width: 60%;
 }

@@ -19,7 +19,6 @@ export class CarService {
     });
   }
 
-
   deleteAllFromDb() {
     const uploadUrl = `${this.BASE_URL}/h2/deleteAll`;
     return this.http.delete(uploadUrl,{responseType: 'text'});
@@ -58,10 +57,24 @@ export class CarService {
   }
 
   getCarsByYear(year: number): Observable<any> {
-    const yearUrl = `${this.BASE_URL}/report/22/year/${year}`;
+    const yearUrl = `${this.BASE_URL}/report/h2/year/${year}`;
     return this.http.get(yearUrl,{
       responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
       observe: 'response'
+    });
+  }
+
+  getH2MakeOptions(): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/h2/Car/makeOptions`;
+    return this.http.get(yearUrl,{
+      responseType: 'json'
+    });
+  }
+
+  getH2YearOptions(): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/h2/Car/yearOptions`;
+    return this.http.get(yearUrl,{
+      responseType: 'json'
     });
   }
 }

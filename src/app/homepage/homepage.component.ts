@@ -10,14 +10,26 @@ import {CarService} from "../services/car.service";
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent {
+  fileInputEl: HTMLInputElement | null = null;
   yearControl = new FormControl('');
   fileToUpload: File | null;
   errorMessage: string | null = null;
   uploadSuccess: boolean | null = null;
   deleteSuccess: boolean | null = null;
 
+  //Filter Parameters
+  makeOptions: string[] = [];
+  yearOptions: string[] = [];
+  selectedMake: string | null = null;
+  selectedYear: string | null = null;
+  selectedFilterByOption: string = 'Make';
+  selectedGroupByOption: string = 'Year';
 
-  fileInputEl: HTMLInputElement | null = null;
+  //Sort and Order Parameters
+  selectedSortDirOption: string = 'ASC';
+      // Code for disabling filter sections
+  isSortOrderActive: boolean = true;  // 'Sort & Order' is active by default
+  isFilterActive: boolean = false;  // 'Filter' is not active by default
 
   constructor(private http: HttpClient,private carService: CarService) {
     this.fileToUpload = null;
@@ -25,8 +37,31 @@ export class HomepageComponent {
 
   ngOnInit(): void {
     this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
+    this.populateMakeOptions();
+    this.populateYearOptions();
+    }
+
+  onSortOrderButtonClick(): void {
+    this.isSortOrderActive = true;
+    this.isFilterActive = false;
   }
 
+  onFilterButtonClick(): void {
+    this.isSortOrderActive = false;
+    this.isFilterActive = true;
+  }
+
+  populateMakeOptions() {
+    this.carService.getH2MakeOptions().subscribe((data)=>{
+      this.makeOptions = data.makeOptions;
+    })
+  }
+
+  populateYearOptions() {
+    this.carService.getH2YearOptions().subscribe((data)=>{
+      this.yearOptions = data.yearOptions;
+    })
+  }
 
   handleFileInput(event: Event) {
     if (this.fileToUpload) {
@@ -77,6 +112,8 @@ export class HomepageComponent {
           if (this.fileInputEl) {
             this.fileInputEl.value = '';
           }
+
+          this.populateMakeOptions()
         }
       })
     } else {
@@ -110,6 +147,8 @@ export class HomepageComponent {
         setTimeout(() => {
           this.deleteSuccess = null;
         }, 3000);
+
+        this.populateMakeOptions()
       }
     });
 
