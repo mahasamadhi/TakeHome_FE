@@ -93,7 +93,7 @@ export class HomepageComponent {
             this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
             break;
           case 'Price':
-            this.carService.getAllCarsLessThan(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
             break;
           default:
             break;
@@ -103,13 +103,13 @@ export class HomepageComponent {
       if (this.selectedDatasource == 'csv') {
         switch (this.selectedFilterByOption) {
           case 'Make':
-            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.selectedDatasource);
+            this.getAllByMakeCSV()
             break;
           case 'Year':
-            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption);
+            this.getAllByYearCSV()
             break;
           case 'Price':
-            this.carService.getAllCarsLessThan(this.priceFilter, this.filterSortDirOption);
+            this.getAllLessThanCSV();
             break;
           default:
             break;
@@ -159,6 +159,38 @@ export class HomepageComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.groupByMakeCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
+    } else {
+      this.errorMessage = 'No file selected';
+    }
+  }
+
+  getAllByMakeCSV() {
+    if (this.fileToUpload) {
+      this.errorMessage = null;
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+      this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload());
+    } else {
+      this.errorMessage = 'No file selected';
+    }
+  }
+
+  getAllByYearCSV() {
+    if (this.fileToUpload) {
+      this.errorMessage = null;
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+      this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+    } else {
+      this.errorMessage = 'No file selected';
+    }
+  }
+  getAllLessThanCSV() {
+    if (this.fileToUpload) {
+      this.errorMessage = null;
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+      this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
     } else {
       this.errorMessage = 'No file selected';
     }
@@ -239,7 +271,7 @@ export class HomepageComponent {
   onSortOrderButtonClick(): void {
     this.isGroupSortActive = true;
     this.isFilterActive = false;
-    this.fileToUpload = null;
+    // this.fileToUpload = null;
   }
 
   onFilterButtonClick(): void {
@@ -292,7 +324,6 @@ export class HomepageComponent {
       if (fileItem) {
         this.fileToUpload = fileItem;
         this.errorMessage = null;
-        if (this.isFilterActive) {
           Papa.parse(fileItem, {
             header: true,
             complete: (result) => {
@@ -300,7 +331,6 @@ export class HomepageComponent {
               this.extractOptions(result.data);
             }
           })
-        }
       } else {
         this.errorMessage = 'No file selected';
       }

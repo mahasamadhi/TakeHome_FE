@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {Form} from "@angular/forms";
 
 @Injectable({
   providedIn: 'root'
@@ -41,62 +42,93 @@ export class CarService {
   }
 
   //CSV Source
-  groupByYearCSV(sortDir: string, formData: FormData): Observable<any> {
-    const Url = `${this.BASE_URL}/report/csv/groupByYear/${sortDir}`;
-    return this.http.post(Url, formData, {
+
+    //GROUP BY
+    groupByYearCSV(sortDir: string, formData: FormData): Observable<any> {
+      const Url = `${this.BASE_URL}/report/csv/groupByYear/${sortDir}`;
+      return this.http.post(Url, formData, {
+        responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+        observe: 'response'
+      });
+    }
+
+    groupByMakeCSV(sortDir: string, formData: FormData): Observable<any> {
+      const getUrl = `${this.BASE_URL}/report/csv/groupByMake/${sortDir}`; // adjust this to your actual endpoint
+      return this.http.post(getUrl,formData,{
+        responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+        observe: 'response'
+      });
+    }
+
+    //FILTER BY
+
+    getAllByYearCSV(year: number, formData: FormData,sortDir: string): Observable<any> {
+      const yearUrl = `${this.BASE_URL}/report/csv/year/${year}/${sortDir}`;
+      return this.http.post(yearUrl,formData,{
+        responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+        observe: 'response'
+      });
+    }
+
+  getAllByMakeCSV(make: string, formData: FormData,sortDir: string): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/report/csv/make/${make}/${sortDir}`;
+    return this.http.post(yearUrl,formData,{
       responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
       observe: 'response'
     });
   }
 
-  groupByMakeCSV(sortDir: string, formData: FormData): Observable<any> {
-    const getUrl = `${this.BASE_URL}/report/csv/groupByMake/${sortDir}`; // adjust this to your actual endpoint
-    return this.http.post(getUrl,formData,{
+  getCarsLessThanCSV(price: number, formData: FormData, sortDir: string): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/report/csv/price/${price}/${sortDir}`;
+    return this.http.post(yearUrl,formData,{
       responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
       observe: 'response'
     });
   }
+
 
   //DATABASE Source
 
-  groupByMakeDB(sortDir: string): Observable<any> {
-    const getUrl = `${this.BASE_URL}/report/h2/groupByMake/${sortDir}`; // adjust this to your actual endpoint
-    return this.http.get(getUrl,{
-      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-      observe: 'response'
-    });
-  }
+    //GROUP BY
+      groupByMakeDB(sortDir: string): Observable<any> {
+        const getUrl = `${this.BASE_URL}/report/h2/groupByMake/${sortDir}`; // adjust this to your actual endpoint
+        return this.http.get(getUrl,{
+          responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+          observe: 'response'
+        });
+      }
 
-  groupByYearDB(sortDir: string): Observable<any> {
-    const yearUrl = `${this.BASE_URL}/report/h2/groupByYear/${sortDir}`;
-    return this.http.get(yearUrl,{
-      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-      observe: 'response'
-    });
-  }
+      groupByYearDB(sortDir: string): Observable<any> {
+        const yearUrl = `${this.BASE_URL}/report/h2/groupByYear/${sortDir}`;
+        return this.http.get(yearUrl,{
+          responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+          observe: 'response'
+        });
+      }
 
-  getAllByYearDB(year: number,sortDir: string): Observable<any> {
-    const yearUrl = `${this.BASE_URL}/report/h2/year/${year}/${sortDir}`;
-    return this.http.get(yearUrl,{
-      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-      observe: 'response'
-    });
-  }
+      //FILTER BY
+      getAllByYearDB(year: number,sortDir: string): Observable<any> {
+        const yearUrl = `${this.BASE_URL}/report/h2/year/${year}/${sortDir}`;
+        return this.http.get(yearUrl,{
+          responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+          observe: 'response'
+        });
+      }
 
-  getAllByMakeDB(make: string, sortDir: string ): Observable<any> {
-    const makeUrl = `${this.BASE_URL}/report/h2/make/${make}/${sortDir}`;
-    return this.http.get(makeUrl,{
-      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-      observe: 'response'
-    });
-  }
-  getAllCarsLessThan(price: number, sortDir: string): Observable<any> {
-    const priceUrl = `${this.BASE_URL}/report/h2/price/${price}/${sortDir}`;
-    return this.http.get(priceUrl,{
-      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-      observe: 'response'
-    });
-  }
+      getAllByMakeDB(make: string, sortDir: string ): Observable<any> {
+        const makeUrl = `${this.BASE_URL}/report/h2/make/${make}/${sortDir}`;
+        return this.http.get(makeUrl,{
+          responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+          observe: 'response'
+        });
+      }
+      getCarsLessThanDB(price: number, sortDir: string): Observable<any> {
+        const priceUrl = `${this.BASE_URL}/report/h2/price/${price}/${sortDir}`;
+        return this.http.get(priceUrl,{
+          responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+          observe: 'response'
+        });
+      }
 
   getH2MakeOptions(): Observable<any> {
     const yearUrl = `${this.BASE_URL}/h2/Car/makeOptions`;
