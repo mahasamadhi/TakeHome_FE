@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import {CarService} from "../services/car.service";
-
+import * as Papa from 'papaparse';
 
 @Component({
   selector: 'app-homepage',
@@ -32,6 +32,8 @@ export class HomepageComponent {
   //Sort and Order Parameters
   selectedSortDirOption: string = 'asc';
       // Code for disabling filter sections
+  filterSortDirOption: string = 'asc';
+      // Code for disabling filter sections
   isGroupSortActive: boolean = true;  // 'Sort & Order' is active by default
   isFilterActive: boolean = false;  // 'Filter' is not active by default
 
@@ -47,8 +49,6 @@ export class HomepageComponent {
 
   ngOnInit(): void {
     this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
-    this.populateMakeOptions();
-    this.populateYearOptions();
     }
 
   submitRequest() {
@@ -70,10 +70,10 @@ export class HomepageComponent {
       if (this.selectedDatasource == 'h2') {
         switch (this.selectedGroupByOption) {
           case 'Year':
-            this.carService.getAllByYearDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
+            this.carService.groupByYearDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
             break;
           case 'Make':
-            this.carService.getAllByMakeDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
+            this.carService.groupByMakeDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
             break;
           default:
             break;
@@ -82,23 +82,61 @@ export class HomepageComponent {
 
     }
     if (this.isFilterActive) {
-      this.queryParams["filterBy"] = this.selectedFilterByOption;
 
-      switch (this.selectedFilterByOption) {
-        case 'Make':
-          this.carService.getCarsByMake(this.selectedMake ? this.selectedMake : '', this.selectedDatasource);
-          break;
-        case 'Year':
-          this.carService.getCarsByYear(Number(this.selectedYear), this.selectedDatasource);
-          break;
-        case 'Price':
+      if (this.selectedDatasource == 'h2') {
 
-          this.carService.getAllCarsLessThan(this.priceFilter, this.selectedDatasource);
-          break;
-        default:
-          break;
+        switch (this.selectedFilterByOption) {
+          case 'Make':
+            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            break;
+          case 'Year':
+            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            break;
+          case 'Price':
+            this.carService.getAllCarsLessThan(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            break;
+          default:
+            break;
+        }
+      }
+
+      if (this.selectedDatasource == 'csv') {
+        switch (this.selectedFilterByOption) {
+          case 'Make':
+            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.selectedDatasource);
+            break;
+          case 'Year':
+            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption);
+            break;
+          case 'Price':
+            this.carService.getAllCarsLessThan(this.priceFilter, this.filterSortDirOption);
+            break;
+          default:
+            break;
+
+        }
       }
     }
+  }
+
+// ...
+
+  // handleFileInput(event) {
+  //   const file = event.target.files[0];
+  //   Papa.parse(file, {
+  //     header: true,
+  //     complete: (result) => {
+  //       console.log('Parsed: ', result);
+  //       this.extractOptions(result.data);
+  //     }
+  //   });
+  // }
+
+  extractOptions(data: any[]) {
+    this.makeOptions = [];
+    this.yearOptions = [];
+    this.makeOptions = [...new Set(data.map(item => item.make))];
+    this.yearOptions = [...new Set(data.map(item => item.year))];
   }
 
 
@@ -109,7 +147,7 @@ export class HomepageComponent {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getAllByYearCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
+      this.carService.groupByYearCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
     } else {
       this.errorMessage = 'No file selected';
     }
@@ -120,7 +158,7 @@ export class HomepageComponent {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getAllByMakeCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
+      this.carService.groupByMakeCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
     } else {
       this.errorMessage = 'No file selected';
     }
@@ -175,7 +213,7 @@ export class HomepageComponent {
           this.deleteSuccess = null;
         }, 3000);
 
-        this.populateMakeOptions()
+        this.populateDBOptions()
       }
     });
 
@@ -201,11 +239,34 @@ export class HomepageComponent {
   onSortOrderButtonClick(): void {
     this.isGroupSortActive = true;
     this.isFilterActive = false;
+    this.fileToUpload = null;
   }
 
   onFilterButtonClick(): void {
     this.isGroupSortActive = false;
     this.isFilterActive = true;
+  }
+
+  onSourceChange(newDatasourceVal: string) {
+    if (newDatasourceVal == 'h2') {
+      this.clearOptions()
+      this.populateDBOptions()
+      this.fileToUpload = null;
+    }
+    if (newDatasourceVal == 'csv') {
+      this.clearOptions()
+      this.fileToUpload = null;
+    }
+  }
+
+  clearOptions() {
+    this.makeOptions = [];
+    this.yearOptions = [];
+  }
+
+  populateDBOptions() {
+    this.populateMakeOptions();
+    this.populateYearOptions();
   }
 
   populateMakeOptions() {
@@ -231,9 +292,20 @@ export class HomepageComponent {
       if (fileItem) {
         this.fileToUpload = fileItem;
         this.errorMessage = null;
+        if (this.isFilterActive) {
+          Papa.parse(fileItem, {
+            header: true,
+            complete: (result) => {
+              console.log('Parsed: ', result);
+              this.extractOptions(result.data);
+            }
+          })
+        }
       } else {
         this.errorMessage = 'No file selected';
       }
     }
+
+
   }
 }

@@ -8,7 +8,7 @@
     <div class="inner-container">
       <h2>Choose your datasource</h2>
       <div class="flexRow">
-        <select [(ngModel)]="selectedDatasource">
+        <select [(ngModel)]="selectedDatasource"  (change)="onSourceChange(this.selectedDatasource)">
           <option value="csv">CSV File</option>
           <option value="h2">Database</option>
           <option value="fs">Server Filesystem</option>
@@ -66,7 +66,7 @@
           <select id="filterParam" class="queryParamsSelect" [(ngModel)]="selectedFilterByOption" [disabled]="!isFilterActive">
             <option value="Make">Make</option>
             <option value="Year">Year</option>
-            <option value="Price">Price</option>
+            <option value="Price">MSRP</option>
           </select>
         </div>
 
@@ -81,10 +81,20 @@
           </select>
         </div>
 
-        <div *ngIf="selectedFilterByOption == 'Price'" >
+        <div style="margin-left: 20px;" *ngIf="selectedFilterByOption == 'Price'" >
           <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Less than</h3>
           <input id="priceFilter" type="number" [(ngModel)]="priceFilter" [disabled]="!isFilterActive">
         </div>
+
+<!--        <div style="">-->
+<!--          <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Sort</h3>-->
+<!--          <select id="orderDirectionFilter" class="queryParamsSelect" [(ngModel)]="selectedSortDirOption" [disabled]="!isFilterActive">-->
+<!--            <option value="asc">ASC</option>-->
+<!--            <option value="desc">DESC</option>-->
+<!--          </select>-->
+<!--        </div>-->
+
+
 
 
 
