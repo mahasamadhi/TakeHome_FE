@@ -4,9 +4,32 @@
 </div>
 <div class="container">
 
-  <div class="input-file-container" style="margin-bottom: 0px;">
+  <div id="chooseDataSourceDiv" >
+    <div class="inner-container">
+      <h2>Choose your datasource</h2>
+      <div class="flexRow">
+        <select [(ngModel)]="selectedDatasource">
+          <option value="csv">CSV File</option>
+          <option value="h2">Database</option>
+          <option value="fs">Server Filesystem</option>
+        </select>
+        <div *ngIf="selectedDatasource =='h2'" class="button-container" style="margin-bottom: 0px;">
+          <button *ngIf="!showSubmitToDb" class="button" (click)="showSubmitToDb = true;">Insert data from CSV</button>
+        </div>
+        <div *ngIf="selectedDatasource =='h2'" class="button-container" style="margin-bottom: 0px;">
+          <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All from DB</button>
+
+        </div>
+      </div>
+      <p class="success" *ngIf="deleteSuccess">Data successfully deleted</p>
+      <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
+    </div>
+  </div>
+
+  <div *ngIf="selectedDatasource == 'csv' || showSubmitToDb" class="input-file-container" style="margin-bottom: 0px;">
     <input id="fileInput" type="file" (change)="handleFileInput($event)">
   </div>
+  <button *ngIf="showSubmitToDb" class="button" (click)="insertCSVToDb()">Submit to Database</button>
 
   <div class="error-space">
     <span *ngIf="errorMessage" class="error">{{ errorMessage }}</span>
@@ -14,21 +37,21 @@
 
   <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 15px;">
     <div class="inner-container" >
-      <button class="button" [style.background-color]="isSortOrderActive ? '#014796' : '#7CBAFFFF'" (click)="onSortOrderButtonClick()"><h3>Sort & Order</h3></button>
+      <button class="button" [style.background-color]="isGroupSortActive ? '#014796' : '#7CBAFFFF'" (click)="onSortOrderButtonClick()"><h3>Group & Order</h3></button>
       <div id="queryParamsDiv" class="">
         <div class="" >
-          <h3 [style.color]="isSortOrderActive ? 'black' : 'lightgrey'">Group by</h3>
-          <select id="groupBy" class="queryParamsSelect" [(ngModel)]="selectedGroupByOption" [disabled]="!isSortOrderActive">
+          <h3 [style.color]="isGroupSortActive ? 'black' : 'lightgrey'">Group by</h3>
+          <select id="groupBy" class="queryParamsSelect" [(ngModel)]="selectedGroupByOption" [disabled]="!isGroupSortActive">
             <option value="Year">Year</option>
             <option value="Make">Make</option>
           </select>
         </div>
 
         <div>
-          <h3 [style.color]="isSortOrderActive ? 'black' : 'lightgrey'">Order Direction</h3>
-          <select id="orderDirection" class="queryParamsSelect" [(ngModel)]="selectedSortDirOption" [disabled]="!isSortOrderActive">
-            <option value="ASC">ASC</option>
-            <option value="DESC">DESC</option>
+          <h3 [style.color]="isGroupSortActive ? 'black' : 'lightgrey'">Order Direction</h3>
+          <select id="orderDirection" class="queryParamsSelect" [(ngModel)]="selectedSortDirOption" [disabled]="!isGroupSortActive">
+            <option value="asc">ASC</option>
+            <option value="desc">DESC</option>
           </select>
         </div>
 
@@ -60,7 +83,7 @@
 
         <div *ngIf="selectedFilterByOption == 'Price'" >
           <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Less than</h3>
-          <input id="priceFilter" [disabled]="!isFilterActive">
+          <input id="priceFilter" type="number" [(ngModel)]="priceFilter" [disabled]="!isFilterActive">
         </div>
 
 
@@ -68,6 +91,10 @@
       </div>
     </div>
 
+  </div>
+
+  <div>
+    <button style="background-color: darkgreen" class="button" (click)="submitRequest()"><h1>Submit Request</h1></button>
   </div>
 
 
@@ -116,16 +143,16 @@
     </div>
     <!--    HR HERE-->
 
-    <div class="button-container">
-      <button class="button" (click)="getAllFromDBByYear()">Get All from DB by Year</button>
-    </div>
-    <div class="button-container">
-      <button class="button" (click)="getAllFromDBByMake()">Get All from DB by Make</button>
-    </div>
-    <div class="input-container">
-      <button class="button" (click)="selectByYear()">Select by Year</button>
-      <input class="input" type="text" [formControl]="yearControl">
-    </div>
+<!--    <div class="button-container">-->
+<!--      <button class="button" (click)="getAllFromDBByYear()">Get All from DB by Year</button>-->
+<!--    </div>-->
+<!--    <div class="button-container">-->
+<!--      <button class="button" (click)="getAllFromDBByMake()">Get All from DB by Make</button>-->
+<!--    </div>-->
+<!--    <div class="input-container">-->
+<!--      <button class="button" (click)="selectByYear()">Select by Year</button>-->
+<!--      <input class="input" type="text" [formControl]="yearControl">-->
+<!--    </div>-->
     <hr>
 
   </div>

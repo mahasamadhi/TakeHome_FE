@@ -51,7 +51,7 @@ body {
   background: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -118,6 +118,12 @@ hr {
 
 #filterVal{
   margin-bottom: 20px;
+}
+
+.flexRow{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 #priceFilter{
