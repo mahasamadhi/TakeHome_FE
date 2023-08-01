@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import {CarService} from "../services/car.service";
+import { DataService } from '../services/data.service';
 import * as Papa from 'papaparse';
 
 @Component({
@@ -10,13 +11,15 @@ import * as Papa from 'papaparse';
   styleUrls: ['./homepage.component.css']
 })
 export class HomepageComponent {
+  //file
   fileInputEl: HTMLInputElement | null = null;
-  yearControl = new FormControl('');
   fileToUpload: File | null;
+  //messages
   errorMessage: string | null = null;
   uploadSuccess: boolean | null = null;
   deleteSuccess: boolean | null = null;
 
+  //to toggle submit button for adding csv to database
   showSubmitToDb: boolean = false;
 
   //Filter Parameters
@@ -26,24 +29,21 @@ export class HomepageComponent {
   selectedYear: string | null = null;
   selectedFilterByOption: string = 'Make';
   selectedGroupByOption: string = 'Year';
-
   priceFilter: number = 0;
 
   //Sort and Order Parameters
   selectedSortDirOption: string = 'asc';
-      // Code for disabling filter sections
   filterSortDirOption: string = 'asc';
-      // Code for disabling filter sections
-  isGroupSortActive: boolean = true;  // 'Sort & Order' is active by default
-  isFilterActive: boolean = false;  // 'Filter' is not active by default
+
+  // for managing the status of the filter and group by sections
+  isGroupSortActive: boolean = true;
+  isFilterActive: boolean = false;
 
   //choosing datasource
-
   selectedDatasource: string = 'csv';
 
-  queryParams: any = {};
 
-  constructor(private http: HttpClient,private carService: CarService) {
+  constructor(private http: HttpClient,private carService: CarService,  private dataService: DataService) {
     this.fileToUpload = null;
   }
 
@@ -55,31 +55,15 @@ export class HomepageComponent {
     if (this.isGroupSortActive) {
 
       if (this.selectedDatasource == 'csv') {
-        switch (this.selectedGroupByOption) {
-          case 'Year':
-            this.csvToPdfByYear();
-            break;
-          case 'Make':
-            this.csvToPdfByMake()
-            break;
-          default:
-            break;
-        }
+        this.CSVGroupBy();
       }
-
       if (this.selectedDatasource == 'h2') {
-        switch (this.selectedGroupByOption) {
-          case 'Year':
-            this.carService.groupByYearDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
-            break;
-          case 'Make':
-            this.carService.groupByMakeDB(this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
-            break;
-          default:
-            break;
-        }
+          this.carService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
       }
 
+      if (this.selectedDatasource == 'fs') {
+        this.displayErrorMessage("Feature not implemented! See word doc for explanation");
+      }
     }
     if (this.isFilterActive) {
 
@@ -119,48 +103,20 @@ export class HomepageComponent {
     }
   }
 
-// ...
-
-  // handleFileInput(event) {
-  //   const file = event.target.files[0];
-  //   Papa.parse(file, {
-  //     header: true,
-  //     complete: (result) => {
-  //       console.log('Parsed: ', result);
-  //       this.extractOptions(result.data);
-  //     }
-  //   });
-  // }
-
-  extractOptions(data: any[]) {
-    this.makeOptions = [];
-    this.yearOptions = [];
-    this.makeOptions = [...new Set(data.map(item => item.make))];
-    this.yearOptions = [...new Set(data.map(item => item.year))];
-  }
-
-
 
 //CSV TO PDF
-  csvToPdfByYear() {
-    if (this.fileToUpload) {
-      this.errorMessage = null;
-      const formData: FormData = new FormData();
-      formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.groupByYearCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
-    } else {
-      this.errorMessage = 'No file selected';
-    }
-  }
 
-  csvToPdfByMake() {
+  //FormData object follows 'ReportOptions' pojo in backend
+  CSVGroupBy() {
     if (this.fileToUpload) {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.groupByMakeCSV(this.selectedSortDirOption,formData).subscribe(this.getObserverForPdfDownload())
+      formData.append('groupBy', this.selectedGroupByOption);
+      formData.append('sort', this.selectedSortDirOption);
+      this.carService.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload())
     } else {
-      this.errorMessage = 'No file selected';
+      this.displayErrorMessage('No file selected');
     }
   }
 
@@ -171,7 +127,7 @@ export class HomepageComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload());
     } else {
-      this.errorMessage = 'No file selected';
+      this.displayErrorMessage('No file selected');
     }
   }
 
@@ -182,7 +138,7 @@ export class HomepageComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
     } else {
-      this.errorMessage = 'No file selected';
+      this.displayErrorMessage('No file selected');
     }
   }
   getAllLessThanCSV() {
@@ -192,11 +148,12 @@ export class HomepageComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
     } else {
-      this.errorMessage = 'No file selected';
+      this.displayErrorMessage('No file selected');
     }
   }
 
-  //DATABASE
+  //OTHER DATABASE OPERATIONS
+
   insertCSVToDb() {
     if (this.fileToUpload) {
       this.errorMessage = null;
@@ -225,7 +182,7 @@ export class HomepageComponent {
         }
       })
     } else {
-      this.errorMessage = 'No file selected';
+      this.displayErrorMessage('No file selected');
       this.showSubmitToDb = false;
     }
   }
@@ -268,17 +225,7 @@ export class HomepageComponent {
     }
   }
 
-  onSortOrderButtonClick(): void {
-    this.isGroupSortActive = true;
-    this.isFilterActive = false;
-    // this.fileToUpload = null;
-  }
-
-  onFilterButtonClick(): void {
-    this.isGroupSortActive = false;
-    this.isFilterActive = true;
-  }
-
+  //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
     if (newDatasourceVal == 'h2') {
       this.clearOptions()
@@ -290,52 +237,70 @@ export class HomepageComponent {
       this.fileToUpload = null;
     }
   }
-
   clearOptions() {
     this.makeOptions = [];
     this.yearOptions = [];
   }
-
   populateDBOptions() {
     this.populateMakeOptions();
     this.populateYearOptions();
   }
-
   populateMakeOptions() {
-    this.carService.getH2MakeOptions().subscribe((data)=>{
+    this.carService.getDBMakeOptions().subscribe((data)=>{
       this.makeOptions = data.makeOptions;
     })
   }
 
   populateYearOptions() {
-    this.carService.getH2YearOptions().subscribe((data)=>{
+    this.carService.getDBYearOptions().subscribe((data)=>{
       this.yearOptions = data.yearOptions;
     })
   }
 
+  //managing disable of inputs
+  onSortOrderButtonClick(): void {
+    this.isGroupSortActive = true;
+    this.isFilterActive = false;
+    // this.fileToUpload = null;
+  }
+  onFilterButtonClick(): void {
+    this.isGroupSortActive = false;
+    this.isFilterActive = true;
+  }
+  //other
   handleFileInput(event: Event) {
+    const element = event.target as HTMLInputElement;
+    let fileList: FileList | null = element.files;
+
+    //resets file when uploading another afterwards
     if (this.fileToUpload) {
       this.fileToUpload = null;
     }
-    const element = event.target as HTMLInputElement;
-    let fileList: FileList | null = element.files;
+
     if (fileList) {
       let fileItem: File | null = fileList.item(0);
       if (fileItem) {
         this.fileToUpload = fileItem;
         this.errorMessage = null;
-          Papa.parse(fileItem, {
-            header: true,
-            complete: (result) => {
-              console.log('Parsed: ', result);
-              this.extractOptions(result.data);
-            }
-          })
+        this.dataService.parseFile(fileItem, (result) => {
+          console.log('Parsed: ', result);
+          const options = this.dataService.extractOptions(result.data);
+          this.makeOptions = options.makeOptions;
+          this.yearOptions = options.yearOptions;
+        });
       } else {
-        this.errorMessage = 'No file selected';
+        this.displayErrorMessage('No file selected');
       }
     }
-
-
+  }
+  displayErrorMessage(message: string) {
+    this.errorMessage = message;
+    setTimeout(() => {
+      this.errorMessage = null;
+    }, 3000);
+    this.fileToUpload = null;
   }
 }
+
+
+
