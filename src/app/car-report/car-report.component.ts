@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {CarService} from "../services/car.service";
-import { DataService } from '../services/data.service';
+import { CsvService } from '../services/csv.service';
 
 
 @Component({
-  selector: 'app-homepage',
-  templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.css']
+  selector: 'app-car-report',
+  templateUrl: './car-report.component.html',
+  styleUrls: ['./car-report.component.css']
 })
-export class HomepageComponent {
+export class CarReportComponent {
   //file
   fileInputEl: HTMLInputElement | null = null;
   fileToUpload: File | null;
@@ -42,7 +42,7 @@ export class HomepageComponent {
   selectedDatasource: string = 'csv';
 
 
-  constructor(private http: HttpClient,private carService: CarService,  private dataService: DataService) {
+  constructor(private http: HttpClient,private carService: CarService,  private dataService: CsvService) {
     this.fileToUpload = null;
   }
 

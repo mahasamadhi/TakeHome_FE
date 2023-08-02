@@ -4,7 +4,7 @@ import * as Papa from 'papaparse';
 @Injectable({
   providedIn: 'root'
 })
-export class DataService {
+export class CsvService {
 
   constructor() { }
 

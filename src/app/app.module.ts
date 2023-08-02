@@ -2,18 +2,19 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
-import {HomepageComponent} from "./homepage/homepage.component";
 import { ReactiveFormsModule } from '@angular/forms';
 import {FormsModule} from "@angular/forms";
 import { GroupOrderComponent } from './group-order/group-order.component';
 import { FilterComponent } from './filter/filter.component';
+import {CarReportComponent} from "./car-report/car-report.component";
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomepageComponent,
+    CarReportComponent,
     GroupOrderComponent,
-    FilterComponent
+    FilterComponent,
+    CarReportComponent
   ],
   imports: [
     BrowserModule,
