@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {CarService} from "../services/car.service";
 import { CsvService } from '../services/csv.service';
+import { saveAs } from 'file-saver';
 
 
 @Component({
@@ -90,7 +91,8 @@ export class CarReportComponent {
         this.CSVGroupBy();
       }
       if (this.selectedDatasource == 'h2') {
-          this.carService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload())
+          this.carService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(
+            "Cars by - " + this.selectedGroupByOption + ", Sort - " + this.selectedSortDirOption))
       }
 
       if (this.selectedDatasource == 'fs') {
@@ -103,13 +105,16 @@ export class CarReportComponent {
 
         switch (this.selectedFilterByOption) {
           case 'Make':
-            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+              "Cars by make - " + this.selectedMake));
             break;
           case 'Year':
-            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+              "Cars by year - " + this.selectedYear));
             break;
           case 'Price':
-            this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+            this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+              "Cars less than - $" + this.priceFilter));
             break;
           default:
             break;
@@ -146,7 +151,7 @@ export class CarReportComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       formData.append('groupBy', this.selectedGroupByOption);
       formData.append('sort', this.selectedSortDirOption);
-      this.carService.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload())
+      this.carService.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload("CarListBy - " + this.selectedGroupByOption))
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -157,7 +162,8 @@ export class CarReportComponent {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload());
+      this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload(
+         this.selectedMake + "Car List"));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -168,7 +174,9 @@ export class CarReportComponent {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+      this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+        this.selectedYear + "Car List"
+      ));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -178,7 +186,8 @@ export class CarReportComponent {
       this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload());
+      this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+        "Cars less than - $" + this.priceFilter));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -240,22 +249,6 @@ export class CarReportComponent {
 
   }
 
-  getObserverForPdfDownload() {
-    return {
-      next: (response: any) => {
-        console.log(response);
-        const blob = new Blob([response.body], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        window.open(url);
-      },
-      error: (error: any) => {
-        console.log('An error occurred:', error);
-      },
-      complete: () => {
-        console.log('Request completed');
-      }
-    }
-  }
 
   //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
@@ -328,6 +321,26 @@ export class CarReportComponent {
       this.errorMessage = null;
     }, 3000);
     this.fileToUpload = null;
+  }
+
+  getObserverForPdfDownload(reportType: string) {
+    return {
+      next: (response: any) => {
+        const Filename = reportType
+
+        // Create a new Blob from the response body
+        const blob = new Blob([response.body], { type: 'application/pdf' });
+
+        // Save the file using with filename
+        saveAs(blob, Filename);
+      },
+      error: (error: any) => {
+        console.log('An error occurred:', error);
+      },
+      complete: () => {
+        console.log('Request completed');
+      }
+    }
   }
 }
 
