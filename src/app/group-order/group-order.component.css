@@ -1,0 +1,46 @@
+.inner-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.2); /* Small shadow for a "card" effect */
+}
+
+.button {
+  padding: 10px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.button:hover {
+  background: #014796;
+}
+
+#queryParamsDiv{
+  /*border: black solid 1px;*/
+  /*height: 50%;*/
+  width: 300px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  /*gap: 15px;*/
+  background: white;
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.1); /* Small shadow for a "card" effect */
+}
+
+.queryParamsSelect{
+  margin-bottom: 20px;
+  width: 100%;
+}

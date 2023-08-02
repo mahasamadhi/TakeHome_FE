@@ -5,11 +5,15 @@ import { AppComponent } from './app.component';
 import {HomepageComponent} from "./homepage/homepage.component";
 import { ReactiveFormsModule } from '@angular/forms';
 import {FormsModule} from "@angular/forms";
+import { GroupOrderComponent } from './group-order/group-order.component';
+import { FilterComponent } from './filter/filter.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomepageComponent
+    HomepageComponent,
+    GroupOrderComponent,
+    FilterComponent
   ],
   imports: [
     BrowserModule,

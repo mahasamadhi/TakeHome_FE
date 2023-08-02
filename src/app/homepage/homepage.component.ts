@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FormControl } from '@angular/forms';
 import {CarService} from "../services/car.service";
 import { DataService } from '../services/data.service';
-import * as Papa from 'papaparse';
+
 
 @Component({
   selector: 'app-homepage',
@@ -50,6 +49,39 @@ export class HomepageComponent {
   ngOnInit(): void {
     this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
     }
+
+  //from group & order child component
+
+  handleGroupByOptionChange(groupByOption: string): void {
+    this.selectedGroupByOption = groupByOption;
+  }
+
+  handleSortDirOptionChange(sortDirOption: string): void {
+    this.selectedSortDirOption = sortDirOption;
+  }
+
+  //from filter child component
+
+  onFilterButtonClick(): void {
+    this.isGroupSortActive = false;
+    this.isFilterActive = true;
+  }
+
+  onSelectedFilterByOptionChange(value: string) {
+    this.selectedFilterByOption = value;
+  }
+
+  onSelectedMakeChange(value: string) {
+    this.selectedMake = value;
+  }
+
+  onSelectedYearChange(value: string) {
+   this.selectedYear = value;
+  }
+
+  onPriceFilterChange(value: number) {
+  this.priceFilter = value;
+  }
 
   submitRequest() {
     if (this.isGroupSortActive) {
@@ -263,10 +295,7 @@ export class HomepageComponent {
     this.isFilterActive = false;
     // this.fileToUpload = null;
   }
-  onFilterButtonClick(): void {
-    this.isGroupSortActive = false;
-    this.isFilterActive = true;
-  }
+
   //other
   handleFileInput(event: Event) {
     const element = event.target as HTMLInputElement;

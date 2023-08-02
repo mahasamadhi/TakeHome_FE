@@ -1,0 +1,38 @@
+<div class="inner-container">
+  <button class="button" [style.background-color]="isFilterActive ? '#014796' : '#7CBAFFFF'" (click)="onFilterButtonClick()"><h3>Filter</h3></button>
+  <div id="queryParamsDiv" class="">
+    <div class="">
+      <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Parameter</h3>
+      <select id="filterParam" class="queryParamsSelect" [(ngModel)]="selectedFilterByOption" (ngModelChange)="selectedFilterByOptionChange.emit(selectedFilterByOption)" [disabled]="!isFilterActive">
+        <option value="Make">Make</option>
+        <option value="Year">Year</option>
+        <option value="Price">MSRP</option>
+      </select>
+    </div>
+
+    <div *ngIf="selectedFilterByOption != 'Price'">
+      <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Value</h3>
+      <select *ngIf="selectedFilterByOption=='Make'" id="filterVal" class="queryParamsSelect" [(ngModel)]="selectedMake" (ngModelChange)="selectedMakeChange.emit(selectedMake)" [disabled]="!isFilterActive">
+        <option *ngFor="let make of makeOptions" [value]="make">{{ make }}</option>
+      </select>
+
+      <select *ngIf="selectedFilterByOption=='Year'" id="filterVal" class="queryParamsSelect" [(ngModel)]="selectedYear" (ngModelChange)="selectedYearChange.emit(selectedYear)" [disabled]="!isFilterActive">
+        <option *ngFor="let year of yearOptions" [value]="year">{{ year }}</option>
+      </select>
+    </div>
+
+    <div style="margin-left: 20px;" *ngIf="selectedFilterByOption == 'Price'" >
+      <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Less than</h3>
+      <input id="priceFilter" type="number" [(ngModel)]="priceFilter" (ngModelChange)="priceFilterChange.emit(priceFilter)" [disabled]="!isFilterActive">
+    </div>
+
+    <!--        <div style="">-->
+    <!--          <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Sort</h3>-->
+    <!--          <select id="orderDirectionFilter" class="queryParamsSelect" [(ngModel)]="selectedSortDirOption" [disabled]="!isFilterActive">-->
+    <!--            <option value="asc">ASC</option>-->
+    <!--            <option value="desc">DESC</option>-->
+    <!--          </select>-->
+    <!--        </div>-->
+
+  </div>
+</div>

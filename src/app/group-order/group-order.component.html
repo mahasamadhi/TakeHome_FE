@@ -1,0 +1,20 @@
+<div class="inner-container" >
+  <button class="button" [style.background-color]="isGroupSortActive ? '#014796' : '#7CBAFFFF'" (click)="onSortOrderButtonClick()"><h3>Group & Order</h3></button>
+  <div id="queryParamsDiv" class="">
+    <div class="" >
+      <h3 [style.color]="isGroupSortActive ? 'black' : 'lightgrey'">Group by</h3>
+      <select id="groupBy" class="queryParamsSelect" [(ngModel)]="selectedGroupByOption" (ngModelChange)="selectedGroupByOptionChange.emit($event)" [disabled]="!isGroupSortActive">
+        <option value="Year">Year</option>
+        <option value="Make">Make</option>
+      </select>
+    </div>
+
+    <div>
+      <h3 [style.color]="isGroupSortActive ? 'black' : 'lightgrey'">Order Direction</h3>
+      <select id="orderDirection" class="queryParamsSelect" [(ngModel)]="selectedSortDirOption" (ngModelChange)="selectedSortDirOptionChange.emit($event)" [disabled]="!isGroupSortActive">
+        <option value="asc">ASC</option>
+        <option value="desc">DESC</option>
+      </select>
+    </div>
+  </div>
+</div>
