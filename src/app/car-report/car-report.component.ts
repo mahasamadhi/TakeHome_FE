@@ -163,7 +163,7 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload(
-         this.selectedMake + "Car List"));
+         this.selectedMake + " Car List"));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -175,7 +175,7 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-        this.selectedYear + "Car List"
+        this.selectedYear + " Car List"
       ));
     } else {
       this.displayErrorMessage('No file selected');
