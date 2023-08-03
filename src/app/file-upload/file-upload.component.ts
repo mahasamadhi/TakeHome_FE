@@ -10,7 +10,7 @@ export class FileUploadComponent {
 
   @Input() selectedDatasource!: string;
 
-  @Output() fileInputChange = new EventEmitter<FileList>();
+  @Output() fileInputChange = new EventEmitter<File>();
 
   @Output() errorMsg = new EventEmitter<string>();
 
@@ -32,9 +32,15 @@ export class FileUploadComponent {
   handleFileInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const files = target.files;
-    if (files) {
+    if (files && files.length > 0) {
       this.fileToUpload = files.item(0);
-      this.fileInputChange.emit(files);
+      if (this.fileToUpload) {
+        this.fileInputChange.emit(this.fileToUpload);
+      } else {
+        console.log('No file selected');
+      }
+    } else {
+      console.log('No files available');
     }
   }
 
@@ -53,7 +59,7 @@ export class FileUploadComponent {
   }
   insertCSVToDb() {
     if (this.fileToUpload) {
-      const formData: FormData = new FormData();
+       let formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.insertCsvToDb(formData).subscribe({
         next: (response: any) => {

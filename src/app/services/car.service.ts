@@ -35,6 +35,14 @@ export class CarService {
     });
   }
 
+  getAllBy(formData: FormData): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/csv/report/getBy`
+    return this.http.post(yearUrl,formData,{
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
+
   getAllByMakeCSV(make: string, formData: FormData,sortDir: string): Observable<any> {
   const yearUrl = `${this.BASE_URL}/csv/report/make/${make}/${sortDir}`;
   return this.http.post(yearUrl,formData,{

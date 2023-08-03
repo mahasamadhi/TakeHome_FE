@@ -15,8 +15,8 @@ export class CarDataFsService {
 
   //GROUP BY
 
-  groupByParameterCSV(formData: FormData): Observable<any> {
-    const url = `${this.BASE_URL}/csv/report/group`;
+  groupByParameterFs(formData: FormData): Observable<any> {
+    const url = `${this.BASE_URL}/fs/report/group`;
     return this.http.post(url, formData, {
       responseType: 'blob' as 'json', // blob response (PDF File)
       observe: 'response'
