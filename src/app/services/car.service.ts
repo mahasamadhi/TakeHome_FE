@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import {Form} from "@angular/forms";
 
 @Injectable({
@@ -8,7 +9,9 @@ import {Form} from "@angular/forms";
 })
 export class CarService {
 
-  private BASE_URL = 'http://localhost:8080/api'; // change this to your Spring Boot API URL
+  private BASE_URL = environment.apiUrl; // change this to your Spring Boot API URL
+  // private BASE_URL = 'http://localhost:8080/api'; // change this to your Spring Boot API URL
+
 
   constructor(private http: HttpClient) { }
 

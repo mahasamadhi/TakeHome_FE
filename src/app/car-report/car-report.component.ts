@@ -16,7 +16,7 @@ export class CarReportComponent {
   fileToUpload: File | null;
   //messages
   errorMessage: string | null = null;
-  uploadSuccess: boolean | null = null;
+  successMsg: string | null = null;
   deleteSuccess: boolean | null = null;
 
   //to toggle submit button for adding csv to database
@@ -68,6 +68,10 @@ export class CarReportComponent {
     this.isFilterActive = true;
   }
 
+  onShowSubmitToDb(val : boolean): void {
+    this.showSubmitToDb = val;
+  }
+
   onSelectedFilterByOptionChange(value: string) {
     this.selectedFilterByOption = value;
   }
@@ -84,58 +88,52 @@ export class CarReportComponent {
   this.priceFilter = value;
   }
 
-  submitRequest() {
-    if (this.isGroupSortActive) {
+  submitGroupSortRequest() {
+    if (this.selectedDatasource == 'csv') {
+      this.CSVGroupBy();
+    }
+    if (this.selectedDatasource == 'h2') {
+      this.carService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(
+        "Cars_by_" + this.selectedGroupByOption + "_sorted_" + this.selectedSortDirOption))
+    }
+    if (this.selectedDatasource == 'fs') {
+      this.displayErrorMessage("Feature not implemented! See word doc for explanation");
+    }
+  }
 
-      if (this.selectedDatasource == 'csv') {
-        this.CSVGroupBy();
-      }
-      if (this.selectedDatasource == 'h2') {
-          this.carService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(
-            "Cars by - " + this.selectedGroupByOption + ", Sort - " + this.selectedSortDirOption))
-      }
-
-      if (this.selectedDatasource == 'fs') {
-        this.displayErrorMessage("Feature not implemented! See word doc for explanation");
+  submitFilterRequest() {
+    if (this.selectedDatasource == 'h2') {
+      switch (this.selectedFilterByOption) {
+        case 'Make':
+          this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+             this.selectedMake + " Cars"));
+          break;
+        case 'Year':
+          this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+             this.selectedYear + " Cars"));
+          break;
+        case 'Price':
+          this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+            "Cars < $" + this.priceFilter));
+          break;
+        default:
+          break;
       }
     }
-    if (this.isFilterActive) {
+    if (this.selectedDatasource == 'csv') {
+      switch (this.selectedFilterByOption) {
+        case 'Make':
+          this.getAllByMakeCSV()
+          break;
+        case 'Year':
+          this.getAllByYearCSV()
+          break;
+        case 'Price':
+          this.getAllLessThanCSV();
+          break;
+        default:
+          break;
 
-      if (this.selectedDatasource == 'h2') {
-
-        switch (this.selectedFilterByOption) {
-          case 'Make':
-            this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-              "Cars by make - " + this.selectedMake));
-            break;
-          case 'Year':
-            this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-              "Cars by year - " + this.selectedYear));
-            break;
-          case 'Price':
-            this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-              "Cars less than - $" + this.priceFilter));
-            break;
-          default:
-            break;
-        }
-      }
-
-      if (this.selectedDatasource == 'csv') {
-        switch (this.selectedFilterByOption) {
-          case 'Make':
-            this.getAllByMakeCSV()
-            break;
-          case 'Year':
-            this.getAllByYearCSV()
-            break;
-          case 'Price':
-            this.getAllLessThanCSV();
-            break;
-          default:
-            break;
-
-        }
       }
     }
   }
@@ -151,7 +149,7 @@ export class CarReportComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       formData.append('groupBy', this.selectedGroupByOption);
       formData.append('sort', this.selectedSortDirOption);
-      this.carService.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload("CarListBy - " + this.selectedGroupByOption))
+      this.carService.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -163,7 +161,7 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload(
-         this.selectedMake + " Car List"));
+         this.selectedMake + " Cars"));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -175,7 +173,7 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-        this.selectedYear + " Car List"
+        this.selectedYear + " Cars"
       ));
     } else {
       this.displayErrorMessage('No file selected');
@@ -187,7 +185,7 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-        "Cars less than - $" + this.priceFilter));
+        "Cars < $" + this.priceFilter));
     } else {
       this.displayErrorMessage('No file selected');
     }
@@ -195,38 +193,6 @@ export class CarReportComponent {
 
   //OTHER DATABASE OPERATIONS
 
-  insertCSVToDb() {
-    if (this.fileToUpload) {
-      this.errorMessage = null;
-      const formData: FormData = new FormData();
-      formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.insertCsvToDb(formData).subscribe({
-        next: (response: any) => {
-          console.log(response);
-        },
-        error: (error: any) => {
-          console.log('An error occurred:', error);
-        },
-        complete: () => {
-          console.log('Request completed');
-          this.uploadSuccess = true;
-          setTimeout(()=>{
-            this.uploadSuccess = null;
-          }, 3000)
-          this.fileToUpload = null;
-          if (this.fileInputEl) {
-            this.fileInputEl.value = '';
-          }
-
-          this.populateMakeOptions()
-          this.showSubmitToDb = false;
-        }
-      })
-    } else {
-      this.displayErrorMessage('No file selected');
-      this.showSubmitToDb = false;
-    }
-  }
 
   deleteAllFromDb() {
     this.carService.deleteAllFromDb().subscribe({
@@ -237,12 +203,7 @@ export class CarReportComponent {
         console.log('An error occurred:', error);
       },
       complete: () => {
-        console.log('Request completed');
-        this.deleteSuccess = true;
-        setTimeout(() => {
-          this.deleteSuccess = null;
-        }, 3000);
-
+        this.displaySuccessMessage("All Data Deleted.")
         this.populateDBOptions()
       }
     });
@@ -256,6 +217,7 @@ export class CarReportComponent {
       this.clearOptions()
       this.populateDBOptions()
       this.fileToUpload = null;
+
     }
     if (newDatasourceVal == 'csv') {
       this.clearOptions()
@@ -289,36 +251,26 @@ export class CarReportComponent {
     // this.fileToUpload = null;
   }
 
+  onDbUploadSuccess(): void {
+    this.populateDBOptions();
+  }
+
   //other
-  handleFileInput(event: Event) {
-    const element = event.target as HTMLInputElement;
-    let fileList: FileList | null = element.files;
-
-    //resets file when uploading another afterwards
-    if (this.fileToUpload) {
-      this.fileToUpload = null;
-    }
-
-    if (fileList) {
-      let fileItem: File | null = fileList.item(0);
-      if (fileItem) {
-        this.fileToUpload = fileItem;
-        this.errorMessage = null;
-        this.dataService.parseFile(fileItem, (result) => {
-          console.log('Parsed: ', result);
-          const options = this.dataService.extractOptions(result.data);
-          this.makeOptions = options.makeOptions;
-          this.yearOptions = options.yearOptions;
-        });
-      } else {
-        this.displayErrorMessage('No file selected');
-      }
-    }
+  handleFileInput(files: FileList) {
+    this.fileToUpload = files.item(0);
   }
   displayErrorMessage(message: string) {
     this.errorMessage = message;
     setTimeout(() => {
       this.errorMessage = null;
+    }, 3000);
+    this.fileToUpload = null;
+  }
+
+  displaySuccessMessage(message: string) {
+    this.successMsg = message;
+    setTimeout(() => {
+      this.successMsg = null;
     }, 3000);
     this.fileToUpload = null;
   }

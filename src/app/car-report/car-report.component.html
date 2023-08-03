@@ -4,35 +4,38 @@
 </div>
 <div class="container">
 
-  <div id="chooseDataSourceDiv" >
-    <div class="inner-container">
+    <div class="chooseDatasource-container">
       <h2>Choose your datasource</h2>
-      <div class="flexRow">
+      <div class="flexColumn">
         <select [(ngModel)]="selectedDatasource"  (change)="onSourceChange(this.selectedDatasource)">
           <option value="csv">CSV File</option>
           <option value="h2">Database</option>
           <option value="fs">Server Filesystem</option>
         </select>
-        <div *ngIf="selectedDatasource =='h2'" class="button-container" style="margin-bottom: 0px;">
-          <button *ngIf="!showSubmitToDb" class="button" (click)="showSubmitToDb = true;">Insert data from CSV</button>
-        </div>
-        <div *ngIf="selectedDatasource =='h2'" class="button-container" style="margin-bottom: 0px;">
-          <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All from DB</button>
 
-        </div>
       </div>
-      <p class="success" *ngIf="deleteSuccess">Data successfully deleted</p>
-      <p class="success" *ngIf="uploadSuccess">Data successfully inserted</p>
     </div>
+
+  <div class="flexRow">
+
+  <div *ngIf="selectedDatasource =='h2' && !showSubmitToDb" class="button-container" style="margin-bottom: 0px;">
+    <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All</button>
   </div>
 
-  <div *ngIf="selectedDatasource == 'csv' || showSubmitToDb" class="input-file-container" style="margin-bottom: 0px;">
-    <input id="fileInput" type="file" (change)="handleFileInput($event)">
-  </div>
-  <button *ngIf="showSubmitToDb" class="button" (click)="insertCSVToDb()">Submit to Database</button>
+  <app-file-upload
+    [selectedDatasource]="selectedDatasource"
+    (fileInputChange)="handleFileInput($event)"
+    (errorMsg)="displayErrorMessage($event)"
+    (uploadToDbSuccess)="onDbUploadSuccess()"
+    (showSubmitToDbButton)="onShowSubmitToDb($event)"
+  ></app-file-upload>
 
-  <div class="error-space">
-    <span *ngIf="errorMessage" class="error">{{ errorMessage }}</span>
+  </div>
+
+
+  <div class="message-space">
+    <span  class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
+    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
   </div>
 
   <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 15px;">
@@ -57,7 +60,8 @@
   </div>
 
   <div>
-    <button style="background-color: darkgreen" class="button" (click)="submitRequest()"><h1>Submit Request</h1></button>
+    <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupSortRequest()"><h1>Submit Request</h1></button>
+    <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>
 
 <!--  </div>-->
