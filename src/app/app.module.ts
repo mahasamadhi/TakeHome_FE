@@ -8,6 +8,7 @@ import { GroupOrderComponent } from './group-order/group-order.component';
 import { FilterComponent } from './filter/filter.component';
 import {CarReportComponent} from "./car-report/car-report.component";
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { ReportFormComponent } from './report-form/report-form.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FileUploadComponent } from './file-upload/file-upload.component';
     GroupOrderComponent,
     FilterComponent,
     CarReportComponent,
-    FileUploadComponent
+    FileUploadComponent,
+    ReportFormComponent
   ],
   imports: [
     BrowserModule,

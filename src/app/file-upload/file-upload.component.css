@@ -1,0 +1,61 @@
+.input-file-container{
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 0px;
+  margin-top: 20px;
+  gap: 15px;
+}
+
+
+.button {
+  padding: 10px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  font-size: 20pt;
+}
+
+
+.message-space {
+  /*height: 20px; !* or however tall you expect your error messages to be *!*/
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+}
+
+.success {
+  color: green;
+  font-weight: bold;
+}
+
+.cancel-button{
+  padding: 10px 10px;
+  background: #626279;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.inner-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: white;
+  border-radius: 10px; /* Rounded corners */
+  /*box-shadow: 0px 0px 10px rgba(0,0,0,0.2); !* Small shadow for a "card" effect *!*/
+}

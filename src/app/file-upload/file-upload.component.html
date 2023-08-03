@@ -1,0 +1,16 @@
+<div class="inner-container">
+
+
+<button *ngIf="selectedDatasource == 'h2' && !showSubmit" class="button" style="width: 150px;margin-top:19px;" (click)="showSubmitToDb()">Insert data from CSV</button>
+
+<div class="input-file-container" style="margin-bottom: 0px;">
+  <input *ngIf="selectedDatasource == 'csv' || (selectedDatasource == 'h2' && showSubmit)" #fileInput id="fileInput" type="file" (change)="handleFileInput($event)">
+  <div style="display: flex; gap: 10px;">
+    <button *ngIf="showSubmit" class="button" (click)="insertCSVToDb()">Submit to Database</button>
+    <button *ngIf="showSubmit" class="cancel-button" (click)="cancelUpload()">Cancel</button>
+  </div>
+</div>
+
+<p class="success" *ngIf="successMsg">{{successMsg}}</p>
+
+</div>

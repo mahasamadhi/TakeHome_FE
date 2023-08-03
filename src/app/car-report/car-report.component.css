@@ -89,10 +89,14 @@ body {
 
 
 .message-space {
-  height: 10px; /* or however tall you expect your error messages to be */
+  height: 20px;
+  width: 200px;/* or however tall you expect your error messages to be */
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 10px;
+  /*border: solid 2px lightgrey;*/
+  /*padding: 10px;*/
 }
 .success {
   color: green;

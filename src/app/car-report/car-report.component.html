@@ -38,7 +38,7 @@
     <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
   </div>
 
-  <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 15px;">
+  <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;">
   <app-group-order
     [isGroupSortActive]="isGroupSortActive"
     (selectedGroupByOptionChange)="handleGroupByOptionChange($event)"
@@ -59,7 +59,7 @@
 
   </div>
 
-  <div>
+  <div style="margin-top: 30px;">
     <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupSortRequest()"><h1>Submit Request</h1></button>
     <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>

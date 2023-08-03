@@ -2,27 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import {Form} from "@angular/forms";
-
 @Injectable({
   providedIn: 'root'
 })
-export class CarService {
-
-  private BASE_URL = environment.apiUrl;
-
+/*
+This service holds the endpoints for car data that is retrieved from the filesystem
+ */
+export class CarDataFsService {
   constructor(private http: HttpClient) { }
 
-//CSV Source
+  private BASE_URL = environment.apiUrl;
 
   //GROUP BY
 
   groupByParameterCSV(formData: FormData): Observable<any> {
-  const url = `${this.BASE_URL}/csv/report/group`;
-  return this.http.post(url, formData, {
-    responseType: 'blob' as 'json', // blob response (PDF File)
-    observe: 'response'
-  });
+    const url = `${this.BASE_URL}/csv/report/group`;
+    return this.http.post(url, formData, {
+      responseType: 'blob' as 'json', // blob response (PDF File)
+      observe: 'response'
+    });
   }
 
   //FILTER BY
@@ -36,20 +34,20 @@ export class CarService {
   }
 
   getAllByMakeCSV(make: string, formData: FormData,sortDir: string): Observable<any> {
-  const yearUrl = `${this.BASE_URL}/csv/report/make/${make}/${sortDir}`;
-  return this.http.post(yearUrl,formData,{
-    responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-    observe: 'response'
-  });
-}
+    const yearUrl = `${this.BASE_URL}/csv/report/make/${make}/${sortDir}`;
+    return this.http.post(yearUrl,formData,{
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
 
-getCarsLessThanCSV(price: number, formData: FormData, sortDir: string): Observable<any> {
-  const yearUrl = `${this.BASE_URL}/csv/report/price/${price}/${sortDir}`;
-  return this.http.post(yearUrl,formData,{
-    responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-    observe: 'response'
-  });
-}
+  getCarsLessThanCSV(price: number, formData: FormData, sortDir: string): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/csv/report/price/${price}/${sortDir}`;
+    return this.http.post(yearUrl,formData,{
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
 
 
 //DATABASE Source
@@ -88,27 +86,27 @@ getCarsLessThanCSV(price: number, formData: FormData, sortDir: string): Observab
   }
 
 //OTHER DATABASE OPERATIONS
-getDBMakeOptions(): Observable<any> {
-  const yearUrl = `${this.BASE_URL}/h2/Car/makeOptions`;
-  return this.http.get(yearUrl,{
-    responseType: 'json'
-  });
-}
-getDBYearOptions(): Observable<any> {
-  const yearUrl = `${this.BASE_URL}/h2/Car/yearOptions`;
-  return this.http.get(yearUrl,{
-    responseType: 'json'
-  });
-}
-insertCsvToDb(formData: FormData): Observable<any> {
-  const uploadUrl = `${this.BASE_URL}/h2/insertCsv`;
-  return this.http.post(uploadUrl, formData, {
-    responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
-    observe: 'response'
-  });
-}
-deleteAllFromDb() {
-  const uploadUrl = `${this.BASE_URL}/h2/deleteAll`;
-  return this.http.delete(uploadUrl,{responseType: 'text'});
-}
+  getDBMakeOptions(): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/h2/Car/makeOptions`;
+    return this.http.get(yearUrl,{
+      responseType: 'json'
+    });
+  }
+  getDBYearOptions(): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/h2/Car/yearOptions`;
+    return this.http.get(yearUrl,{
+      responseType: 'json'
+    });
+  }
+  insertCsvToDb(formData: FormData): Observable<any> {
+    const uploadUrl = `${this.BASE_URL}/h2/insertCsv`;
+    return this.http.post(uploadUrl, formData, {
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
+  deleteAllFromDb() {
+    const uploadUrl = `${this.BASE_URL}/h2/deleteAll`;
+    return this.http.delete(uploadUrl,{responseType: 'text'});
+  }
 }
