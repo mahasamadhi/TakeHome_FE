@@ -9,8 +9,9 @@ export class FilterComponent {
   @Input() isFilterActive = false;
   @Input() makeOptions: string[] = [];
   @Input() yearOptions: string[] = [];
+  @Input() selectedDatasource!: string;
 
-  @Output() filterButtonClick: EventEmitter<void> = new EventEmitter();
+  @Output() filterButtonClick: EventEmitter<string> = new EventEmitter();
   @Output() selectedFilterByOptionChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() selectedMakeChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() selectedYearChange: EventEmitter<string> = new EventEmitter<string>();
@@ -23,6 +24,10 @@ export class FilterComponent {
   constructor() { }
 
   onFilterButtonClick(): void {
-    this.filterButtonClick.emit();
+    if(this.selectedDatasource == 'fs') {
+      this.filterButtonClick.emit("Feature Not Available");
+    } else {
+      this.filterButtonClick.emit("");
+    }
   }
 }

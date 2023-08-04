@@ -84,13 +84,13 @@ body {
 .error {
   color: red;
   font-weight: bold;
-  font-size: 20pt;
+  font-size: 18pt;
 }
 
 
 .message-space {
   height: 20px;
-  width: 200px;/* or however tall you expect your error messages to be */
+  width: 50%;/* or however tall you expect your error messages to be */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +101,7 @@ body {
 .success {
   color: green;
   font-weight: bold;
+  font-size: 18pt;
 }
 
 .titleHeader{

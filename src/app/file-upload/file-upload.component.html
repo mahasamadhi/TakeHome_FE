@@ -9,8 +9,8 @@
     <button *ngIf="showSubmit" class="button" (click)="insertCSVToDb()">Submit to Database</button>
     <button *ngIf="showSubmit" class="cancel-button" (click)="cancelUpload()">Cancel</button>
   </div>
-</div>
+  <p class="success" *ngIf="successMsg">{{successMsg}}</p>
 
-<p class="success" *ngIf="successMsg">{{successMsg}}</p>
+</div>
 
 </div>

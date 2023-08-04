@@ -12,12 +12,17 @@
           <option value="h2">Database</option>
           <option value="fs">Server Filesystem</option>
         </select>
-
       </div>
+
     </div>
 
   <div class="flexRow">
-
+<div *ngIf="selectedDatasource == 'fs'" class="flexRow">
+  <input type="radio" id="download" name="outputOption" checked="true" value="download" [(ngModel)]="fsOutputType">
+  <label for="download">Download PDF</label><br>
+  <input type="radio" id="saveToFs" name="outputOption" value="saveToFs" [(ngModel)]="fsOutputType">
+  <label for="saveToFs">Save to filesystem</label><br>
+</div>
   <div *ngIf="selectedDatasource =='h2' && !showSubmitToDb" class="button-container" style="margin-bottom: 0px;">
     <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All</button>
   </div>
@@ -26,7 +31,7 @@
     [selectedDatasource]="selectedDatasource"
     (fileInputChange)="handleFileInput($event)"
     (errorMsg)="displayErrorMessage($event)"
-    (uploadToDbSuccess)="onDbUploadSuccess()"
+    (uploadToDbSuccess)="onDbUploadSuccess($event)"
     (showSubmitToDbButton)="onShowSubmitToDb($event)"
   ></app-file-upload>
 
@@ -50,18 +55,20 @@
   [isFilterActive]="isFilterActive"
   [makeOptions]="makeOptions"
   [yearOptions]="yearOptions"
-  (filterButtonClick)="onFilterButtonClick()"
+  [selectedDatasource]="selectedDatasource"
+  (filterButtonClick)="onFilterButtonClick($event)"
   (selectedFilterByOptionChange)="onSelectedFilterByOptionChange($event)"
   (selectedMakeChange)="onSelectedMakeChange($event)"
   (selectedYearChange)="onSelectedYearChange($event)"
   (priceFilterChange)="onPriceFilterChange($event)">>
+
 </app-filter>
 
   </div>
 
   <div style="margin-top: 30px;">
-    <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupSortRequest()"><h1>Submit Request</h1></button>
-    <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
+    <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest()"><h1>Submit Request</h1></button>
+    <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>
 
 <!--  </div>-->

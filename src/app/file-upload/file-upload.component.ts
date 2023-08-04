@@ -14,7 +14,7 @@ export class FileUploadComponent {
 
   @Output() errorMsg = new EventEmitter<string>();
 
-  @Output() uploadToDbSuccess: EventEmitter<void> = new EventEmitter();
+  @Output() uploadToDbSuccess: EventEmitter<string> = new EventEmitter();
 
   @Output() showSubmitToDbButton: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -78,20 +78,13 @@ export class FileUploadComponent {
   }
 
   onFileUploadSuccess() {
-    this.showSuccessMsg("Data uploaded successfully")
     this.fileToUpload = null;
-    this.uploadToDbSuccess.emit();
+    this.uploadToDbSuccess.emit("Data uploaded successfully");
     this.hideSubmitToDb();
 
     if (this.fileInputEl) {
       this.fileInputEl.nativeElement.value = '';
     }
-  }
-  showSuccessMsg(msg: string) {
-    this.successMsg = msg
-    setTimeout(()=>{
-      this.successMsg = null;
-    }, 3000)
   }
 
 

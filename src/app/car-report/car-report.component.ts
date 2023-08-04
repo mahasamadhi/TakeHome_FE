@@ -42,16 +42,15 @@ export class CarReportComponent {
   isGroupSortActive: boolean = true;
   isFilterActive: boolean = false;
 
+  //RADIO BUTTON BINDING FOR FILESYSTEM REPORT
+
+  fsOutputType: string = 'download';
+
   //choosing datasource
   selectedDatasource: string = 'csv';
 
 
-  constructor(
-    private http: HttpClient,
-    private carService: CarService,
-    private dataService: CsvService,
-    private carDataFs: CarDataFsService,
-    private  carDataCsv: CarDataCsvService) {
+  constructor(private http: HttpClient, private carService: CarService, private dataService: CsvService, private carDataFs: CarDataFsService, private  carDataCsv: CarDataCsvService) {
     this.fileToUpload = null;
   }
 
@@ -59,7 +58,7 @@ export class CarReportComponent {
     this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
     }
 
-  //from group & order child component
+//FUNCTIONS TO HANDLE CHILD/PARENT INTERACTIONS
 
   handleGroupByOptionChange(groupByOption: string): void {
     this.selectedGroupByOption = groupByOption;
@@ -71,11 +70,15 @@ export class CarReportComponent {
 
   //from filter child component
 
-  onFilterButtonClick(): void {
-    this.isGroupSortActive = false;
-    this.isFilterActive = true;
-  }
+  onFilterButtonClick($event: string): void {
+    if ($event == "") {
+      this.isGroupSortActive = false;
+      this.isFilterActive = true;
+    } else {
+      this.displayErrorMessage($event);
+    }
 
+  }
   onShowSubmitToDb(val : boolean): void {
     this.showSubmitToDb = val;
   }
@@ -96,7 +99,7 @@ export class CarReportComponent {
   this.priceFilter = value;
   }
 
-  submitGroupSortRequest() {
+  submitGroupRequest() {
     if (this.selectedDatasource == 'csv') {
       this.CSVGroupBy();
     }
@@ -111,56 +114,37 @@ export class CarReportComponent {
   }
 
   submitFilterRequest() {
-    const by = this.selectedFilterByOption;
-    if (this.selectedDatasource == 'h2') {
-      switch (by) {
-        case 'Make':
-          this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-             this.selectedMake + " Cars"));
-          break;
-        case 'Year':
-          this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-             this.selectedYear + " Cars"));
-          break;
-        case 'Price':
-          this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-            "Cars < $" + this.priceFilter));
-          break;
-        default:
-          break;
-      }
-    }
-    // if (this.selectedDatasource == 'csv') {
-    //   switch (by) {
-    //     case 'Make':
-    //       this.getAllByMakeCSV()
-    //       break;
-    //     case 'Year':
-    //       this.getAllByYearCSV()
-    //       break;
-    //     case 'Price':
-    //       this.getAllLessThanCSV();
-    //       break;
-    //     default:
-    //       break;
-    //
-    //   }
-    // }
-    if (this.selectedDatasource == 'csv') {
-      switch (by) {
-        case 'Make':
-          this.getAllByCSV(by)
-          break;
-        case 'Year':
-          this.getAllByCSV(by)
-          break;
-        case 'Price':
-          this.getAllByCSV(by);
-          break;
-        default:
-          break;
 
-      }
+    const by = this.selectedFilterByOption;
+
+    if (this.selectedDatasource == 'h2') {
+      this.chooseH2Route(by);
+    }
+
+    if (this.selectedDatasource == 'csv') {
+      this.getAllByCSV(by)
+    }
+    if (this.selectedDatasource == 'fs') {
+      this.displayErrorMessage("Feature not available")
+    }
+  }
+
+  chooseH2Route(filterBy: string): void {
+    switch (filterBy) {
+      case 'Make':
+        this.carService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+          this.selectedMake + " Cars"));
+        break;
+      case 'Year':
+        this.carService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+          this.selectedYear + " Cars"));
+        break;
+      case 'Price':
+        this.carService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+          "Cars less than $" + this.priceFilter));
+        break;
+      default:
+        break;
     }
   }
 
@@ -200,30 +184,29 @@ export class CarReportComponent {
 
   getAllByCSV(by: string) {
     if (this.fileToUpload) {
-      const fileName = "";
-      if (by == 'Price') {
-        fileName =
-      }
+      let fileName = this.getFilterFilename(by)
       this.errorMessage = null;
       const formData = this.fillFormData(by);
-      this.carService.getAllBy(formData).subscribe(this.getObserverForPdfDownload(
-        formData.get("value") + " Cars"
-      ));
+      this.carService.getAllBy(formData).subscribe(this.getObserverForPdfDownload(fileName));
     } else {
       this.displayErrorMessage('No file selected');
     }
   }
-  getAllLessThanCSV() {
-    if (this.fileToUpload) {
-      this.errorMessage = null;
-      const formData: FormData = new FormData();
-      formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-        "Cars < $" + this.priceFilter));
-    } else {
-      this.displayErrorMessage('No file selected');
+
+  getFilterFilename(by:string): string {
+    let fileName = "";
+    if (by == 'Price') {
+      fileName = "Cars less than $" + this.priceFilter;
     }
+    if (by == 'Make') {
+      fileName = this.selectedMake + " Cars"
+    }
+    if (by == 'Year') {
+      fileName = this.selectedYear + " Cars"
+    }
+    return fileName;
   }
+
 
   //file system group by
 
@@ -231,7 +214,17 @@ export class CarReportComponent {
       const formData: FormData = new FormData();
       formData.append('groupBy', this.selectedGroupByOption);
       formData.append('sort', this.selectedSortDirOption);
+      formData.append('outputType', this.fsOutputType)
+
+    if (this.fsOutputType == 'download') {
       this.carDataFs.groupByParameterFs(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
+    } else {
+      this.carDataFs.groupByParameterFs(formData).subscribe((data)=>{
+        if (data.Success == 'true') {
+          this.displaySuccessMessage("File saved in: " + data.OutputPath, 7000);
+        }
+      })
+    }
 
   }
 
@@ -326,7 +319,8 @@ export class CarReportComponent {
     // this.fileToUpload = null;
   }
 
-  onDbUploadSuccess(): void {
+  onDbUploadSuccess(msg :string): void {
+    this.displaySuccessMessage(msg)
     this.populateDBOptions();
   }
 
@@ -343,11 +337,15 @@ export class CarReportComponent {
     this.fileToUpload = null;
   }
 
-  displaySuccessMessage(message: string) {
+  displaySuccessMessage(message: string, timeout?: number) {
     this.successMsg = message;
+    let _timeout = 3000;
+    if (timeout){
+      _timeout = timeout;
+    }
     setTimeout(() => {
       this.successMsg = null;
-    }, 3000);
+    }, _timeout);
     this.fileToUpload = null;
   }
 
@@ -394,6 +392,18 @@ export class CarReportComponent {
 //     this.carService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
 //       this.selectedYear + " Cars"
 //     ));
+//   } else {
+//     this.displayErrorMessage('No file selected');
+//   }
+// }
+//
+// getAllLessThanCSV() {
+//   if (this.fileToUpload) {
+//     this.errorMessage = null;
+//     const formData: FormData = new FormData();
+//     formData.append('file', this.fileToUpload, this.fileToUpload.name);
+//     this.carService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
+//       "Cars < $" + this.priceFilter));
 //   } else {
 //     this.displayErrorMessage('No file selected');
 //   }
