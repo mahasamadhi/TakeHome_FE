@@ -286,6 +286,10 @@ export class CarReportComponent {
       this.clearOptions()
       this.fileToUpload = null;
     }
+
+    if (newDatasourceVal == 'fs') {
+      this.isGroupSortActive = true;
+    }
   }
   clearOptions() {
     this.makeOptions = [];
