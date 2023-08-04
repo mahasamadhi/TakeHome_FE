@@ -87,9 +87,25 @@ body {
   font-size: 18pt;
 }
 
+#copyButton{
+padding: 10px;
+  font-size: 16pt;
+  background-color: cadetblue;
+  margin-left: 10px
+}
+
+#copyButton:hover {
+  padding: 10px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
 
 .message-space {
-  height: 20px;
+  height: 35px;
   width: 50%;/* or however tall you expect your error messages to be */
   display: flex;
   align-items: center;
@@ -101,7 +117,7 @@ body {
 .success {
   color: green;
   font-weight: bold;
-  font-size: 18pt;
+  font-size: 14pt;
 }
 
 .titleHeader{

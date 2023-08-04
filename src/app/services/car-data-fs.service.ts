@@ -15,6 +15,22 @@ export class CarDataFsService {
 
   //GROUP BY
 
+  groupBySaveToFs(formData: FormData): Observable<any> {
+    const url = `${this.BASE_URL}/fs/report/group/saveToFs`;
+    return this.http.post(url, formData, {
+      responseType: 'json'
+    });
+  }
+
+  groupByDownload(formData: FormData): Observable<any> {
+    const url = `${this.BASE_URL}/fs/report/group/download`;
+    return this.http.post(url, formData, {
+      responseType: 'blob' as 'json', // blob response (PDF File)
+      observe: 'response'
+    });
+  }
+
+
   groupByParameterFs(formData: FormData): Observable<any> {
     const url = `${this.BASE_URL}/fs/report/group`;
     const outputType = formData.get("outputType")

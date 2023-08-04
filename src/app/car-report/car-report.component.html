@@ -39,8 +39,14 @@
 
 
   <div class="message-space">
-    <span  class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
-    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+
+      <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
+      <div class="success" *ngIf="successMsg">
+        <p>{{ successMsg }}</p>
+      </div>
+    <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
+
+
   </div>
 
   <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;">

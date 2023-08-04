@@ -5,8 +5,7 @@ import { CsvService } from '../services/csv.service';
 import { saveAs } from 'file-saver';
 import {CarDataFsService} from "../services/car-data-fs.service";
 import {CarDataCsvService} from "../services/car-data-csv.service";
-import {buildEsbuildBrowser} from "@angular-devkit/build-angular/src/builders/browser-esbuild";
-
+import * as ClipboardJS from 'clipboard';
 
 @Component({
   selector: 'app-car-report',
@@ -24,6 +23,9 @@ export class CarReportComponent {
 
   //to toggle submit button for adding csv to database
   showSubmitToDb: boolean = false;
+
+  //when FS datasource, the location of the file that was downlaoded
+  fileLocationOnServer: string | null = null;
 
   //Filter Parameters
   makeOptions: string[] = [];
@@ -57,6 +59,10 @@ export class CarReportComponent {
   ngOnInit(): void {
     this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
     }
+
+  ngAfterViewInit() {
+    new ClipboardJS('#copyButton');
+  }
 
 //FUNCTIONS TO HANDLE CHILD/PARENT INTERACTIONS
 
@@ -217,11 +223,15 @@ export class CarReportComponent {
       formData.append('outputType', this.fsOutputType)
 
     if (this.fsOutputType == 'download') {
-      this.carDataFs.groupByParameterFs(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
+      this.carDataFs.groupByDownload(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
     } else {
-      this.carDataFs.groupByParameterFs(formData).subscribe((data)=>{
+      this.carDataFs.groupBySaveToFs(formData).subscribe((data)=>{
         if (data.Success == 'true') {
           this.displaySuccessMessage("File saved in: " + data.OutputPath, 7000);
+          this.fileLocationOnServer = data.OutputPath;
+          setTimeout(()=>{
+            this.fileLocationOnServer = null;
+          },7000)
         }
       })
     }
