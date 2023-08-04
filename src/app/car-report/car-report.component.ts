@@ -31,7 +31,7 @@ export class CarReportComponent {
   makeOptions: string[] = [];
   yearOptions: string[] = [];
   selectedMake: string | null = null;
-  selectedYear!: string
+  selectedYear: string | null = null;
   selectedFilterByOption: string = 'Make';
   selectedGroupByOption: string = 'Year';
   priceFilter: number = 0;
@@ -90,7 +90,14 @@ export class CarReportComponent {
   }
 
   onSelectedFilterByOptionChange(value: string) {
+    this.clearFilterValues();
     this.selectedFilterByOption = value;
+  }
+
+  clearFilterValues() {
+    this.priceFilter = 0
+    this.selectedYear =  null;
+    this.selectedMake = null;
   }
 
   onSelectedMakeChange(value: string) {
@@ -123,15 +130,20 @@ export class CarReportComponent {
 
     const by = this.selectedFilterByOption;
 
-    if (this.selectedDatasource == 'h2') {
-      this.chooseH2Route(by);
-    }
+    if (this.emptyFilterValue()) {
+      this.displayErrorMessage("Select a filter by value")
+    } else {
 
-    if (this.selectedDatasource == 'csv') {
-      this.getAllByCSV(by)
-    }
-    if (this.selectedDatasource == 'fs') {
-      this.displayErrorMessage("Feature not available")
+      if (this.selectedDatasource == 'h2') {
+        this.chooseH2Route(by);
+      }
+
+      if (this.selectedDatasource == 'csv') {
+        this.getAllByCSV(by)
+      }
+      if (this.selectedDatasource == 'fs') {
+        this.displayErrorMessage("Feature not available")
+      }
     }
   }
 
@@ -154,6 +166,10 @@ export class CarReportComponent {
     }
   }
 
+  emptyFilterValue() {
+     return !(this.selectedMake || this.selectedYear || this.priceFilter)
+  }
+
   fillFormData(by: string): FormData {
     let formData = new FormData();
     formData.append('file', this.fileToUpload!);
@@ -166,7 +182,7 @@ export class CarReportComponent {
       formData.append("value", this.priceFilter.toString())
     }
     if (by == 'Year') {
-      formData.append("value", this.selectedYear)
+      formData.append("value", this.selectedYear!)
     }
     return formData;
   }

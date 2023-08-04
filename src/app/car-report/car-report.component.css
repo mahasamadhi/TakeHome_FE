@@ -82,14 +82,19 @@ body {
 }
 
 .error {
-  color: red;
+  color: #9d0000;
   font-weight: bold;
-  font-size: 18pt;
+  font-size: 22pt;
+}
+.success {
+  color: green;
+  font-weight: bold;
+  font-size: 22pt;
 }
 
 #copyButton{
 padding: 10px;
-  font-size: 16pt;
+  font-size: 18pt;
   background-color: cadetblue;
   margin-left: 10px
 }
@@ -114,11 +119,7 @@ padding: 10px;
   /*border: solid 2px lightgrey;*/
   /*padding: 10px;*/
 }
-.success {
-  color: green;
-  font-weight: bold;
-  font-size: 14pt;
-}
+
 
 .titleHeader{
   display: flex;

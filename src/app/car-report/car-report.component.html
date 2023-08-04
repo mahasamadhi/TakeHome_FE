@@ -38,16 +38,7 @@
   </div>
 
 
-  <div class="message-space">
 
-      <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
-      <div class="success" *ngIf="successMsg">
-        <p>{{ successMsg }}</p>
-      </div>
-    <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
-
-
-  </div>
 
   <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;">
   <app-group-order
@@ -72,11 +63,22 @@
 
   </div>
 
+
+
   <div style="margin-top: 30px;">
     <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest()"><h1>Submit Request</h1></button>
     <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>
 
-<!--  </div>-->
+  <div class="message-space">
+
+    <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
+    <div class="success" *ngIf="successMsg">
+      <p>{{ successMsg }}</p>
+    </div>
+    <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
+
+
+  </div>
 
 </div>
