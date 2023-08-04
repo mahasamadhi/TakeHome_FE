@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ElementRef } from '@angular/core';
-import { CarService } from '../services/car.service';
+import { CarDataDbService } from '../services/car-data-db.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -26,7 +26,7 @@ export class FileUploadComponent {
   successMsg: string | null = null;
   showSubmit: boolean = false;
 
-  constructor(private carService: CarService) {}
+  constructor(private carDataDbService: CarDataDbService) {}
 
 
   handleFileInput(event: Event) {
@@ -61,7 +61,7 @@ export class FileUploadComponent {
     if (this.fileToUpload) {
        let formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carService.insertCsvToDb(formData).subscribe({
+      this.carDataDbService.insertCsvToDb(formData).subscribe({
         next: (response: any) => {
           console.log(response);
         },

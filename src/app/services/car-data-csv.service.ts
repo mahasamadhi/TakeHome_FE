@@ -12,6 +12,21 @@ export class CarDataCsvService {
 
   constructor(private http: HttpClient) { }
 
+  getAllBy(formData: FormData): Observable<any> {
+    const yearUrl = `${this.BASE_URL}/csv/report/getBy`
+    return this.http.post(yearUrl,formData,{
+      responseType: 'blob' as 'json', // Expecting a blob in response (PDF File)
+      observe: 'response'
+    });
+  }
+
+  groupByParameterCSV(formData: FormData): Observable<any> {
+    const url = `${this.BASE_URL}/csv/report/group`;
+    return this.http.post(url, formData, {
+      responseType: 'blob' as 'json', // blob response (PDF File)
+      observe: 'response'
+    });
+  }
 
   getCSVDBMakeOptions(formData: FormData): Observable<any> {
     const yearUrl = `${this.BASE_URL}/csv/Car/makeOptions`;
