@@ -57,7 +57,7 @@
     (sortButtonClick)="onSortOrderButtonClick()"
   ></app-group-order>
 
-<app-filter
+<app-filter *ngIf="selectedDatasource != 'fs'"
   [isFilterActive]="isFilterActive"
   [makeOptions]="makeOptions"
   [yearOptions]="yearOptions"
