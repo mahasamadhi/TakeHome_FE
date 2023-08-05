@@ -13,9 +13,26 @@ export class FilterComponent {
   @Input() isFilterActive = false;
   @Input() makeOptions: string[] = [];
   @Input() yearOptions: string[] = [];
-  @Input() selectedDatasource!: string;
 
-  // fileToUpload: File | null;
+  @Input()
+  set selectedDatasource(val: string){
+    this._selectedDatasource = val;
+    this.clearOptions();
+    if (val == 'h2') {
+      this.populateDBOptions();
+    }
+  }
+  _selectedDatasource!: string;
+
+  @Input()
+  set fileToUpload(file: File | null) {
+    if(file) {
+      this._fileToUpload = file
+      this.populateDBOptions();
+    }
+
+  }
+  _fileToUpload: File | null = null;
 
   @Output() filterButtonClick: EventEmitter<string> = new EventEmitter();
   @Output() selectedFilterByOptionChange: EventEmitter<string> = new EventEmitter<string>();
@@ -32,23 +49,23 @@ export class FilterComponent {
   constructor( private dbData: CarDataDbService, private  csvData: CarDataCsvService) { }
 
   onFilterButtonClick(): void {
-    if(this.selectedDatasource == 'fs') {
+    if(this._selectedDatasource == 'fs') {
       this.filterButtonClick.emit("Feature Not Available");
     } else {
       this.filterButtonClick.emit("");
     }
   }
 
-  populateDBOptions(ds: string,file?: File ) {
-    this.populateMakeOptions(ds, file);
-    this.populateYearOptions(ds, file);
+  populateDBOptions() {
+    this.populateMakeOptions();
+    this.populateYearOptions();
   }
 
-  populateMakeOptions(ds: string,file?: File ) {
-    if (ds == 'csv') {
-      if (file) {
+  populateMakeOptions() {
+    if (this._selectedDatasource == 'csv') {
+      if (this._fileToUpload) {
         const formData: FormData = new FormData();
-        formData.append('file', file, file.name);
+        formData.append('file', this._fileToUpload!, this._fileToUpload!.name);
         this.csvData.getCSVDBMakeOptions(formData).subscribe((data)=>{
           this.makeOptions = data.makeOptions;
         })
@@ -57,7 +74,7 @@ export class FilterComponent {
       }
     }
 
-    if (ds == 'h2') {
+    if (this._selectedDatasource == 'h2') {
       this.dbData.getDBMakeOptions().subscribe((data)=>{
         this.makeOptions = data.makeOptions;
       })
@@ -65,11 +82,11 @@ export class FilterComponent {
 
   }
 
-  populateYearOptions( ds: string,file?: File) {
-    if (ds == 'csv') {
-      if (file) {
+  populateYearOptions() {
+    if (this._selectedDatasource == 'csv') {
+      if (this._fileToUpload) {
         const formData: FormData = new FormData();
-        formData.append('file', file,file.name);
+        formData.append('file', this._fileToUpload!,this._fileToUpload!.name);
         this.csvData.getCSVYearOptions(formData).subscribe((data)=>{
           this.yearOptions = data.yearOptions;
         })
@@ -78,7 +95,7 @@ export class FilterComponent {
       }
 
     }
-    if (ds == 'h2') {
+    if (this._selectedDatasource == 'h2') {
       this.dbData.getDBYearOptions().subscribe((data) => {
         this.yearOptions = data.yearOptions;
       })

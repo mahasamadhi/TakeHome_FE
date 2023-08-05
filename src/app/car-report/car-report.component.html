@@ -7,7 +7,7 @@
     <div class="chooseDatasource-container">
       <h2>Choose your datasource</h2>
       <div class="flexColumn">
-        <select [(ngModel)]="selectedDatasource"  (change)="onSourceChange(this.selectedDatasource)">
+        <select [(ngModel)]="selectedDatasource"  (ngModelChange)="onSourceChange(selectedDatasource)">
           <option value="csv">CSV File</option>
           <option value="h2">Database</option>
           <option value="fs">Server Filesystem</option>
@@ -51,12 +51,16 @@
 <app-filter *ngIf="selectedDatasource != 'fs'"
   [isFilterActive]="isFilterActive"
   [selectedDatasource]="selectedDatasource"
+            [fileToUpload]="fileToUpload"
   (filterButtonClick)="onFilterButtonClick($event)"
             (errorMsg)="displayErrorMessage($event)"
   (selectedFilterByOptionChange)="onSelectedFilterByOptionChange($event)"
   (selectedMakeChange)="onSelectedMakeChange($event)"
   (selectedYearChange)="onSelectedYearChange($event)"
-  (priceFilterChange)="onPriceFilterChange($event)">>
+  (priceFilterChange)="onPriceFilterChange($event)">
+
+  >
+
 
 </app-filter>
 

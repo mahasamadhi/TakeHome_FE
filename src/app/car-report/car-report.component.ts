@@ -22,7 +22,6 @@ export class CarReportComponent {
   //messages
   errorMessage: string | null = null;
   successMsg: string | null = null;
-  deleteSuccess: boolean | null = null;
 
   //to toggle submit button for adding csv to database
   showSubmitToDb: boolean = false;
@@ -266,7 +265,7 @@ export class CarReportComponent {
       },
       complete: () => {
         this.displaySuccessMessage("All Data Deleted.")
-        this.filterComponent.populateDBOptions(this.selectedDatasource)
+        this.filterComponent.populateDBOptions()
       }
     });
 
@@ -275,14 +274,13 @@ export class CarReportComponent {
 
   //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
+    this.selectedDatasource = newDatasourceVal;
+    console.log("new ds: " + this.selectedDatasource)
     if (newDatasourceVal == 'h2') {
-      this.filterComponent.clearOptions()
-      this.filterComponent.populateDBOptions(this.selectedDatasource)
       this.fileToUpload = null;
 
     }
     if (newDatasourceVal == 'csv') {
-      this.filterComponent.clearOptions()
       this.fileToUpload = null;
     }
 
@@ -303,13 +301,13 @@ export class CarReportComponent {
 
   onDbUploadSuccess(msg :string): void {
     this.displaySuccessMessage(msg)
-    this.filterComponent.populateDBOptions(this.selectedDatasource);
+    this.filterComponent.populateDBOptions();
   }
 
   //other
   handleFileInput(file: File) {
     this.fileToUpload = file
-    this.filterComponent.populateDBOptions(this.selectedDatasource,file)
+    // this.filterComponent.populateDBOptions(file)
   }
   displayErrorMessage(message: string) {
     this.errorMessage = message;
