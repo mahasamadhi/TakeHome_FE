@@ -1,7 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import {CarDataDbService} from "../services/car-data-db.service";
-import {CsvService} from "../services/csv.service";
-import {CarDataFsService} from "../services/car-data-fs.service";
 import {CarDataCsvService} from "../services/car-data-csv.service";
 
 @Component({
@@ -13,26 +11,8 @@ export class FilterComponent {
   @Input() isFilterActive = false;
   @Input() makeOptions: string[] = [];
   @Input() yearOptions: string[] = [];
-
-  @Input()
-  set selectedDatasource(val: string){
-    this._selectedDatasource = val;
-    this.clearOptions();
-    if (val == 'h2') {
-      this.populateDBOptions();
-    }
-  }
-  _selectedDatasource!: string;
-
-  @Input()
-  set fileToUpload(file: File | null) {
-    if(file) {
-      this._fileToUpload = file
-      this.populateDBOptions();
-    }
-
-  }
-  _fileToUpload: File | null = null;
+  @Input() selectedDatasource!: string;
+  @Input() fileToUpload: File | null = null;
 
   @Output() filterButtonClick: EventEmitter<string> = new EventEmitter();
   @Output() selectedFilterByOptionChange: EventEmitter<string> = new EventEmitter<string>();
@@ -48,8 +28,30 @@ export class FilterComponent {
   priceFilter = 0;
   constructor( private dbData: CarDataDbService, private  csvData: CarDataCsvService) { }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedDatasource']) {
+      this.handleDatasourceChanges()
+    }
+    if (changes['fileToUpload']) {
+    this.handleFileChanges();
+    }
+  }
+
+  handleDatasourceChanges() {
+    this.clearOptions();
+    if (this.selectedDatasource == 'h2') {
+      this.populateDBOptions();
+    }
+  }
+
+  handleFileChanges() {
+    if(this.fileToUpload) {
+      this.populateDBOptions();
+    }
+  }
+
   onFilterButtonClick(): void {
-    if(this._selectedDatasource == 'fs') {
+    if(this.selectedDatasource == 'fs') {
       this.filterButtonClick.emit("Feature Not Available");
     } else {
       this.filterButtonClick.emit("");
@@ -62,10 +64,10 @@ export class FilterComponent {
   }
 
   populateMakeOptions() {
-    if (this._selectedDatasource == 'csv') {
-      if (this._fileToUpload) {
+    if (this.selectedDatasource == 'csv') {
+      if (this.fileToUpload) {
         const formData: FormData = new FormData();
-        formData.append('file', this._fileToUpload!, this._fileToUpload!.name);
+        formData.append('file', this.fileToUpload!, this.fileToUpload!.name);
         this.csvData.getCSVDBMakeOptions(formData).subscribe((data)=>{
           this.makeOptions = data.makeOptions;
         })
@@ -74,7 +76,7 @@ export class FilterComponent {
       }
     }
 
-    if (this._selectedDatasource == 'h2') {
+    if (this.selectedDatasource == 'h2') {
       this.dbData.getDBMakeOptions().subscribe((data)=>{
         this.makeOptions = data.makeOptions;
       })
@@ -83,10 +85,10 @@ export class FilterComponent {
   }
 
   populateYearOptions() {
-    if (this._selectedDatasource == 'csv') {
-      if (this._fileToUpload) {
+    if (this.selectedDatasource == 'csv') {
+      if (this.fileToUpload) {
         const formData: FormData = new FormData();
-        formData.append('file', this._fileToUpload!,this._fileToUpload!.name);
+        formData.append('file', this.fileToUpload!,this.fileToUpload!.name);
         this.csvData.getCSVYearOptions(formData).subscribe((data)=>{
           this.yearOptions = data.yearOptions;
         })
@@ -95,7 +97,7 @@ export class FilterComponent {
       }
 
     }
-    if (this._selectedDatasource == 'h2') {
+    if (this.selectedDatasource == 'h2') {
       this.dbData.getDBYearOptions().subscribe((data) => {
         this.yearOptions = data.yearOptions;
       })
