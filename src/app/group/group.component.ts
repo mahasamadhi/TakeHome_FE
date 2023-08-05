@@ -1,23 +1,23 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-group-order',
-  templateUrl: './group-order.component.html',
-  styleUrls: ['./group-order.component.css']
+  selector: 'app-group',
+  templateUrl: './group.component.html',
+  styleUrls: ['./group.component.css']
 })
-export class GroupOrderComponent {
+export class GroupComponent {
 
-  @Input() isGroupSortActive = true;
+  @Input() isGroupActive = true;
   selectedGroupByOption = 'Year';
   selectedSortDirOption = 'asc';
 
   @Output() selectedGroupByOptionChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() selectedSortDirOptionChange: EventEmitter<string> = new EventEmitter<string>();
-  @Output() sortButtonClick: EventEmitter<void> = new EventEmitter();
+  @Output() groupButtonClick: EventEmitter<string | null> = new EventEmitter();
 
   constructor() { }
 
-  onSortOrderButtonClick(): void {
-    this.sortButtonClick.emit();
+  onGroupButtonClick(): void {
+    this.groupButtonClick.emit();
   }
 }

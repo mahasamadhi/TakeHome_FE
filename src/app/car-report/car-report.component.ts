@@ -18,7 +18,7 @@ export class CarReportComponent {
   @ViewChild(FilterComponent) filterComponent!: FilterComponent;
   //file
   fileInputEl: HTMLInputElement | null = null;
-  fileToUpload: File | null;
+  fileToUpload: File | null = null;
   //messages
   errorMessage: string | null = null;
   successMsg: string | null = null;
@@ -36,7 +36,7 @@ export class CarReportComponent {
   selectedGroupByOption: string = 'Year';
   priceFilter: number = 0;
 
-  //Sort and Order Parameters
+  //Group and Sort Parameters
   selectedSortDirOption: string = 'asc';
   filterSortDirOption: string = 'asc';
 
@@ -52,17 +52,24 @@ export class CarReportComponent {
   selectedDatasource: string = 'csv';
 
 
-  constructor(private http: HttpClient, private carDataDbService: CarDataDbService, private dataService: CsvService, private carDataFs: CarDataFsService, private  carDataCsv: CarDataCsvService) {
-    this.fileToUpload = null;
-  }
-
-  ngOnInit(): void {
-    this.fileInputEl = document.getElementById('fileInput') as HTMLInputElement;
-    }
+  constructor(
+    private http: HttpClient,
+    private carDataDbService: CarDataDbService,
+    private dataService: CsvService,
+    private carDataFs: CarDataFsService,
+    private  carDataCsv: CarDataCsvService) {}
 
   ngAfterViewInit() {
     new ClipboardJS('#copyButton');
   }
+
+  jiggle(button: HTMLElement): void {
+    button.classList.add('jiggle');
+    setTimeout(() => {
+      button.classList.remove('jiggle');
+    }, 200);  // This duration should match the animation's duration
+  }
+
 
 //FUNCTIONS TO HANDLE CHILD/PARENT INTERACTIONS
 
@@ -72,8 +79,19 @@ export class CarReportComponent {
 
   handleSortDirOptionChange(sortDirOption: string): void {
     this.selectedSortDirOption = sortDirOption;
+    if (this.groupByReady()) {
+      this.jiggle(document.getElementById("submitGroupButton")!);
+    }
+
   }
 
+  groupByReady() {
+    return (this.fileToUpload || this.selectedDatasource =='h2' || this.selectedDatasource == 'fs')
+  }
+
+  handleFileInput(file: File) {
+    this.fileToUpload = file;
+  }
   //from filter child component
 
   onFilterButtonClick($event: string): void {
@@ -83,8 +101,13 @@ export class CarReportComponent {
     } else {
       this.displayErrorMessage($event);
     }
-
   }
+
+  onGroupSortButtonClick(): void {
+    this.isGroupSortActive = true;
+    this.isFilterActive = false;
+  }
+
   onShowSubmitToDb(val : boolean): void {
     this.showSubmitToDb = val;
   }
@@ -102,10 +125,13 @@ export class CarReportComponent {
 
   onSelectedMakeChange(value: string) {
     this.selectedMake = value;
+    this.jiggle(document.getElementById("submitFilterButton")!);
+
   }
 
   onSelectedYearChange(value: string) {
    this.selectedYear = value;
+    this.jiggle(document.getElementById("submitFilterButton")!);
   }
 
   onPriceFilterChange(value: number) {
@@ -113,39 +139,50 @@ export class CarReportComponent {
   }
 
   submitGroupRequest() {
-    if (this.selectedDatasource == 'csv') {
-      this.CSVGroupBy();
-    }
-    if (this.selectedDatasource == 'fs') {
-      this.FsGroupBy();
-    }
-    //this one shows a different method of setting parameters, using the url, see method in service
-    if (this.selectedDatasource == 'h2') {
-      this.carDataDbService.groupByDB(this.selectedGroupByOption,this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(
-        "Cars_by_" + this.selectedGroupByOption + "_sorted_" + this.selectedSortDirOption))
+    window.scrollTo(0, document.body.scrollHeight);
+    switch (this.selectedDatasource) {
+      case 'csv':
+        this.CSVGroupBy();
+        break;
+
+      case 'fs':
+        this.FsGroupBy();
+        break;
+
+      case 'h2':
+        const groupBy = this.selectedGroupByOption
+        const sortDirection = this.selectedSortDirOption;
+        const fileName = `Cars_by_${groupBy}_sorted_${sortDirection}`;
+
+        this.carDataDbService.groupByDB(groupBy, sortDirection)
+          .subscribe(this.getObserverForPdfDownload(fileName));
+        break;
+
+      default:
+        this.displayErrorMessage("Invalid data source selected");
+        break;
     }
   }
 
   submitFilterRequest() {
-
-    const by = this.selectedFilterByOption;
-
+    window.scrollTo(0, document.body.scrollHeight);
     if (this.emptyFilterValue()) {
-      this.displayErrorMessage("Select a filter by value")
-    } else {
-
-      if (this.selectedDatasource == 'h2') {
-        this.chooseH2Route(by);
-      }
-
-      if (this.selectedDatasource == 'csv') {
-        this.CsvGetAllBy(by)
-      }
-      if (this.selectedDatasource == 'fs') {
-        this.displayErrorMessage("Feature not available")
-      }
+      this.displayErrorMessage("Select a filter by value");
+      return;
+    }
+    switch (this.selectedDatasource) {
+      case 'h2':
+        this.chooseH2Route(this.selectedFilterByOption);
+        break;
+      case 'csv':
+        this.CsvGetAllBy(this.selectedFilterByOption);
+        break;
+      default:
+        this.displayErrorMessage("Invalid data source selected");
+        break;
     }
   }
+
 
   chooseH2Route(filterBy: string): void {
     switch (filterBy) {
@@ -186,7 +223,6 @@ export class CarReportComponent {
     }
     return formData;
   }
-
 
 //CSV TO PDF
 
@@ -250,9 +286,7 @@ export class CarReportComponent {
         }
       })
     }
-
   }
-
 
   //OTHER DATABASE OPERATIONS
   deleteAllFromDb() {
@@ -268,9 +302,7 @@ export class CarReportComponent {
         this.filterComponent.populateDBOptions()
       }
     });
-
   }
-
 
   //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
@@ -289,15 +321,7 @@ export class CarReportComponent {
     }
   }
 
-
-
-
   //managing disable of inputs
-  onSortOrderButtonClick(): void {
-    this.isGroupSortActive = true;
-    this.isFilterActive = false;
-    // this.fileToUpload = null;
-  }
 
   onDbUploadSuccess(msg :string): void {
     this.displaySuccessMessage(msg)
@@ -305,10 +329,6 @@ export class CarReportComponent {
   }
 
   //other
-  handleFileInput(file: File) {
-    this.fileToUpload = file
-    // this.filterComponent.populateDBOptions(file)
-  }
   displayErrorMessage(message: string) {
     this.errorMessage = message;
     setTimeout(() => {
@@ -317,15 +337,11 @@ export class CarReportComponent {
     this.fileToUpload = null;
   }
 
-  displaySuccessMessage(message: string, timeout?: number) {
+  displaySuccessMessage(message: string, timeout: number = 3000) {
     this.successMsg = message;
-    let _timeout = 3000;
-    if (timeout){
-      _timeout = timeout;
-    }
     setTimeout(() => {
       this.successMsg = null;
-    }, _timeout);
+    }, timeout);
     this.fileToUpload = null;
   }
 
@@ -333,11 +349,7 @@ export class CarReportComponent {
     return {
       next: (response: any) => {
         const Filename = reportType
-
-        // Create a new Blob from the response body
         const blob = new Blob([response.body], { type: 'application/pdf' });
-
-        // Save the file using with filename
         saveAs(blob, Filename);
       },
       error: (error: any) => {

@@ -1,8 +1,8 @@
 <div class="inner-container">
-  <button class="button" [style.background-color]="isFilterActive ? '#014796' : '#7CBAFFFF'" (click)="onFilterButtonClick()"><h3>Filter</h3></button>
+  <button class="button" [style.background-color]="isFilterActive ? '#014796' : '#7CBAFFFF'" (click)="onFilterButtonClick()"><h3>Filter by</h3></button>
   <div id="queryParamsDiv" class="">
     <div class="">
-      <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Parameter</h3>
+      <h3 [style.color]="isFilterActive ? 'black' : 'lightgrey'">Filter by</h3>
       <select id="filterParam" class="queryParamsSelect" [(ngModel)]="selectedFilterByOption" (ngModelChange)="selectedFilterByOptionChange.emit(selectedFilterByOption)" [disabled]="!isFilterActive">
         <option value="Make">Make</option>
         <option value="Year">Year</option>

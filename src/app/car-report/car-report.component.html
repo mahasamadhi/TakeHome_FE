@@ -41,12 +41,12 @@
 
 
   <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;">
-  <app-group-order
-    [isGroupSortActive]="isGroupSortActive"
+  <app-group
+    [isGroupActive]="isGroupSortActive"
     (selectedGroupByOptionChange)="handleGroupByOptionChange($event)"
     (selectedSortDirOptionChange)="handleSortDirOptionChange($event)"
-    (sortButtonClick)="onSortOrderButtonClick()"
-  ></app-group-order>
+    (groupButtonClick)="onGroupSortButtonClick()"
+  ></app-group>
 
 <app-filter *ngIf="selectedDatasource != 'fs'"
   [isFilterActive]="isFilterActive"
@@ -69,8 +69,8 @@
 
 
   <div style="margin-top: 30px;">
-    <button *ngIf="isGroupSortActive"   [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest()"><h1>Submit Request</h1></button>
-    <button *ngIf="isFilterActive" [style.opacity]="fileToUpload || selectedDatasource =='h2' || selectedDatasource == 'fs' ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
+    <button *ngIf="isGroupSortActive" #btn id="submitGroupButton"   [style.opacity]="groupByReady() ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest();"><h1>Submit Request</h1></button>
+    <button *ngIf="isFilterActive"  id="submitFilterButton"  [style.opacity]="groupByReady() ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>
 
   <div class="message-space">

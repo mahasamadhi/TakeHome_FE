@@ -171,3 +171,24 @@ hr {
   margin-bottom: 20px;
   width: 60px;
 }
+
+
+#submitGroupButton {
+  transition: transform 0.1s;
+}
+
+#submitFilterButton {
+  transition: transform 0.1s;
+}
+
+.jiggle {
+  animation: jiggleAnimation 0.2s;
+}
+
+@keyframes jiggleAnimation {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(3px); }
+  50% { transform: translateY(-3px); }
+  75% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}

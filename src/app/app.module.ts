@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {FormsModule} from "@angular/forms";
-import { GroupOrderComponent } from './group-order/group-order.component';
+import { GroupComponent } from './group/group.component';
 import { FilterComponent } from './filter/filter.component';
 import {CarReportComponent} from "./car-report/car-report.component";
 import { FileUploadComponent } from './file-upload/file-upload.component';
@@ -14,7 +14,7 @@ import { ReportFormComponent } from './report-form/report-form.component';
   declarations: [
     AppComponent,
     CarReportComponent,
-    GroupOrderComponent,
+    GroupComponent,
     FilterComponent,
     CarReportComponent,
     FileUploadComponent,
