@@ -50,10 +50,9 @@
 
 <app-filter *ngIf="selectedDatasource != 'fs'"
   [isFilterActive]="isFilterActive"
-  [makeOptions]="makeOptions"
-  [yearOptions]="yearOptions"
   [selectedDatasource]="selectedDatasource"
   (filterButtonClick)="onFilterButtonClick($event)"
+            (errorMsg)="displayErrorMessage($event)"
   (selectedFilterByOptionChange)="onSelectedFilterByOptionChange($event)"
   (selectedMakeChange)="onSelectedMakeChange($event)"
   (selectedYearChange)="onSelectedYearChange($event)"

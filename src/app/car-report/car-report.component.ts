@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import { CsvService } from '../services/csv.service';
 import { saveAs } from 'file-saver';
@@ -6,6 +6,7 @@ import {CarDataFsService} from "../services/car-data-fs.service";
 import {CarDataCsvService} from "../services/car-data-csv.service";
 import {CarDataDbService} from "../services/car-data-db.service";
 import * as ClipboardJS from 'clipboard';
+import {FilterComponent} from "../filter/filter.component";
 
 @Component({
   selector: 'app-car-report',
@@ -13,6 +14,8 @@ import * as ClipboardJS from 'clipboard';
   styleUrls: ['./car-report.component.css']
 })
 export class CarReportComponent {
+
+  @ViewChild(FilterComponent) filterComponent!: FilterComponent;
   //file
   fileInputEl: HTMLInputElement | null = null;
   fileToUpload: File | null;
@@ -28,8 +31,6 @@ export class CarReportComponent {
   fileLocationOnServer: string | null = null;
 
   //Filter Parameters
-  makeOptions: string[] = [];
-  yearOptions: string[] = [];
   selectedMake: string | null = null;
   selectedYear: string | null = null;
   selectedFilterByOption: string = 'Make';
@@ -265,7 +266,7 @@ export class CarReportComponent {
       },
       complete: () => {
         this.displaySuccessMessage("All Data Deleted.")
-        this.populateDBOptions()
+        this.filterComponent.populateDBOptions(this.selectedDatasource)
       }
     });
 
@@ -275,13 +276,13 @@ export class CarReportComponent {
   //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
     if (newDatasourceVal == 'h2') {
-      this.clearOptions()
-      this.populateDBOptions()
+      this.filterComponent.clearOptions()
+      this.filterComponent.populateDBOptions(this.selectedDatasource)
       this.fileToUpload = null;
 
     }
     if (newDatasourceVal == 'csv') {
-      this.clearOptions()
+      this.filterComponent.clearOptions()
       this.fileToUpload = null;
     }
 
@@ -289,56 +290,9 @@ export class CarReportComponent {
       this.isGroupSortActive = true;
     }
   }
-  clearOptions() {
-    this.makeOptions = [];
-    this.yearOptions = [];
-  }
-  populateDBOptions() {
-    this.populateMakeOptions();
-    this.populateYearOptions();
-  }
-  populateMakeOptions() {
-    if (this.selectedDatasource == 'csv') {
-      if (this.fileToUpload) {
-        this.errorMessage = null;
-        const formData: FormData = new FormData();
-        formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      this.carDataCsv.getCSVDBMakeOptions(formData).subscribe((data)=>{
-        this.makeOptions = data.makeOptions;
-      })
-    } else {
-        this.displayErrorMessage('No file selected');
-      }
-    }
 
-    if (this.selectedDatasource == 'h2') {
-      this.carDataDbService.getDBMakeOptions().subscribe((data)=>{
-        this.makeOptions = data.makeOptions;
-      })
-    }
 
-  }
 
-  populateYearOptions() {
-    if (this.selectedDatasource == 'csv') {
-      if (this.fileToUpload) {
-        this.errorMessage = null;
-        const formData: FormData = new FormData();
-        formData.append('file', this.fileToUpload, this.fileToUpload.name);
-        this.carDataCsv.getCSVYearOptions(formData).subscribe((data)=>{
-          this.yearOptions = data.yearOptions;
-        })
-      } else {
-        this.displayErrorMessage('No file selected');
-      }
-
-    }
-    if (this.selectedDatasource == 'h2') {
-      this.carDataDbService.getDBYearOptions().subscribe((data) => {
-        this.yearOptions = data.yearOptions;
-      })
-    }
-  }
 
   //managing disable of inputs
   onSortOrderButtonClick(): void {
@@ -349,13 +303,13 @@ export class CarReportComponent {
 
   onDbUploadSuccess(msg :string): void {
     this.displaySuccessMessage(msg)
-    this.populateDBOptions();
+    this.filterComponent.populateDBOptions(this.selectedDatasource);
   }
 
   //other
   handleFileInput(file: File) {
     this.fileToUpload = file
-    this.populateDBOptions()
+    this.filterComponent.populateDBOptions(this.selectedDatasource,file)
   }
   displayErrorMessage(message: string) {
     this.errorMessage = message;
