@@ -107,6 +107,7 @@ export class CarReportComponent {
   }
 
   clearFilterValues() {
+    this.filterComponent.clearOptions();
     this.priceFilter = 0
     this.selectedYear =  null;
     this.selectedMake = null;

@@ -104,6 +104,7 @@ export class FilterComponent {
   clearOptions() {
     this.makeOptions = [];
     this.yearOptions = [];
+    this.priceFilter = 0;
   }
 
 }
