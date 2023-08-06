@@ -39,7 +39,6 @@ export class CarReportComponent {
 
   //Group and Sort Parameters
   selectedSortDirOption: string = 'asc';
-  filterSortDirOption: string = 'asc';
 
   // for managing the status of the filter and group by sections
   isGroupSortActive: boolean = true;
@@ -181,13 +180,13 @@ export class CarReportComponent {
     const filename = this.getFilterByFilename(filterBy)
     switch (filterBy) {
       case 'Make':
-        this.carDataDbService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
+        this.carDataDbService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       case 'Year':
-        this.carDataDbService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
+        this.carDataDbService.getAllByYearDB(Number(this.selectedYear), this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       case 'Price':
-        this.carDataDbService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
+        this.carDataDbService.getCarsLessThanDB(this.priceFilter, this.selectedSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       default:
         break;
@@ -204,7 +203,7 @@ export class CarReportComponent {
   fillFormData(by: string): FormData {
     let formData = new FormData();
     formData.append('file', this.fileToUpload!);
-    formData.append("sort", this.filterSortDirOption)
+    formData.append("sort", this.selectedSortDirOption)
     formData.append("filterBy", by)
     if (by == 'Make') {
       formData.append("value", this.selectedMake!)
