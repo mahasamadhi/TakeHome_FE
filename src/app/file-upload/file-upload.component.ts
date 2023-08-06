@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild, ElementRef } from '@angular/core';
 import { CarDataDbService } from '../services/car-data-db.service';
+import {MessageService} from "../services/message.service";
 
 @Component({
   selector: 'app-file-upload',
@@ -9,24 +10,16 @@ import { CarDataDbService } from '../services/car-data-db.service';
 export class FileUploadComponent {
 
   @Input() selectedDatasource!: string;
-
   @Output() fileInputChange = new EventEmitter<File>();
-
-  @Output() errorMsg = new EventEmitter<string>();
-
   @Output() uploadToDbSuccess: EventEmitter<string> = new EventEmitter();
-
   @Output() showSubmitToDbButton: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-
   @ViewChild('fileInput', { static: false }) fileInputEl!: ElementRef;
-
   private fileToUpload: File | null = null;
 
   successMsg: string | null = null;
   showSubmit: boolean = false;
 
-  constructor(private carDataDbService: CarDataDbService) {}
+  constructor(private carDataDbService: CarDataDbService,private messageService: MessageService) {}
 
 
   handleFileInput(event: Event) {
@@ -58,6 +51,7 @@ export class FileUploadComponent {
     this.showSubmitToDbButton.emit(false)
   }
   insertCSVToDb() {
+    window.scrollTo(0, document.body.scrollHeight)
     if (this.fileToUpload) {
        let formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
@@ -73,13 +67,14 @@ export class FileUploadComponent {
         }
       });
     } else {
-      this.errorMsg.emit('Error: no file selected') ;
+      this.messageService.sendError('Error: no file selected') ;
     }
   }
 
   onFileUploadSuccess() {
     this.fileToUpload = null;
-    this.uploadToDbSuccess.emit("Data uploaded successfully");
+    this.messageService.sendSuccess({message:"File inserted succesfully"})
+    this.uploadToDbSuccess.emit();
     this.hideSubmitToDb();
 
     if (this.fileInputEl) {

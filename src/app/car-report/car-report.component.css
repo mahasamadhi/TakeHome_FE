@@ -81,16 +81,7 @@ body {
   width: 50%;
 }
 
-.error {
-  color: #9d0000;
-  font-weight: bold;
-  font-size: 22pt;
-}
-.success {
-  color: green;
-  font-weight: bold;
-  font-size: 22pt;
-}
+
 
 #copyButton{
 padding: 10px;
@@ -109,16 +100,6 @@ padding: 10px;
   transition: background 0.3s ease;
 }
 
-.message-space {
-  height: 35px;
-  width: 50%;/* or however tall you expect your error messages to be */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-  /*border: solid 2px lightgrey;*/
-  /*padding: 10px;*/
-}
 
 
 .titleHeader{
@@ -170,6 +151,10 @@ hr {
 #priceFilter{
   margin-bottom: 20px;
   width: 60px;
+}
+
+#groupFilterContainer{
+  display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;
 }
 
 

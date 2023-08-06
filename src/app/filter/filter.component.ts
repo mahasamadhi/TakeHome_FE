@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import {CarDataDbService} from "../services/car-data-db.service";
 import {CarDataCsvService} from "../services/car-data-csv.service";
+import {MessageService} from "../services/message.service";
 
 @Component({
   selector: 'app-filter',
@@ -19,14 +20,14 @@ export class FilterComponent {
   @Output() selectedMakeChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() selectedYearChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() priceFilterChange: EventEmitter<number> = new EventEmitter<number>();
-  @Output() errorMsg = new EventEmitter<string>();
+
 
 
   selectedFilterByOption = 'Make';
   selectedMake = "";
   selectedYear = "";
   priceFilter = 0;
-  constructor( private dbData: CarDataDbService, private  csvData: CarDataCsvService) { }
+  constructor( private dbData: CarDataDbService, private  csvData: CarDataCsvService, private messageService: MessageService) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedDatasource']) {
@@ -51,11 +52,7 @@ export class FilterComponent {
   }
 
   onFilterButtonClick(): void {
-    if(this.selectedDatasource == 'fs') {
-      this.filterButtonClick.emit("Feature Not Available");
-    } else {
       this.filterButtonClick.emit("");
-    }
   }
 
   populateDBOptions() {
@@ -72,7 +69,7 @@ export class FilterComponent {
           this.makeOptions = data.makeOptions;
         })
       } else {
-        this.errorMsg.emit('Error: no file selected') ;
+        this.messageService.sendError('Error: no file selected');
       }
     }
 
@@ -93,7 +90,7 @@ export class FilterComponent {
           this.yearOptions = data.yearOptions;
         })
       } else {
-        this.errorMsg.emit('Error: no file selected') ;
+        this.messageService.sendError('Error: no file selected') ;
       }
 
     }

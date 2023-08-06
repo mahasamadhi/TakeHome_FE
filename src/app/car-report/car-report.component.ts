@@ -7,6 +7,7 @@ import {CarDataCsvService} from "../services/car-data-csv.service";
 import {CarDataDbService} from "../services/car-data-db.service";
 import * as ClipboardJS from 'clipboard';
 import {FilterComponent} from "../filter/filter.component";
+import {MessageService} from "../services/message.service";
 
 @Component({
   selector: 'app-car-report',
@@ -57,19 +58,12 @@ export class CarReportComponent {
     private carDataDbService: CarDataDbService,
     private dataService: CsvService,
     private carDataFs: CarDataFsService,
-    private  carDataCsv: CarDataCsvService) {}
+    private  carDataCsv: CarDataCsvService,
+  private messageService: MessageService ) {}
 
   ngAfterViewInit() {
     new ClipboardJS('#copyButton');
   }
-
-  jiggle(button: HTMLElement): void {
-    button.classList.add('jiggle');
-    setTimeout(() => {
-      button.classList.remove('jiggle');
-    }, 200);  // This duration should match the animation's duration
-  }
-
 
 //FUNCTIONS TO HANDLE CHILD/PARENT INTERACTIONS
 
@@ -94,13 +88,9 @@ export class CarReportComponent {
   }
   //from filter child component
 
-  onFilterButtonClick($event: string): void {
-    if ($event == "") {
+  onFilterButtonClick(): void {
       this.isGroupSortActive = false;
       this.isFilterActive = true;
-    } else {
-      this.displayErrorMessage($event);
-    }
   }
 
   onGroupSortButtonClick(): void {
@@ -139,7 +129,7 @@ export class CarReportComponent {
   }
 
   submitGroupRequest() {
-    window.scrollTo(0, document.body.scrollHeight);
+    this.scrollToBottom()
     switch (this.selectedDatasource) {
       case 'csv':
         this.CSVGroupBy();
@@ -159,17 +149,20 @@ export class CarReportComponent {
         break;
 
       default:
-        this.displayErrorMessage("Invalid data source selected");
+        this.messageService.sendError("Invalid data source selected");
         break;
     }
   }
 
   submitFilterRequest() {
-    window.scrollTo(0, document.body.scrollHeight);
-    if (this.emptyFilterValue()) {
-      this.displayErrorMessage("Select a filter by value");
+    this.scrollToBottom()
+    if(this.selectedDatasource == 'csv' && !this.fileToUpload) {
+      this.messageService.sendError("No file selected");
+    } else if (this.emptyFilterValue()) {
+      this.messageService.sendError("Select a filter-by value");
       return;
     }
+
     switch (this.selectedDatasource) {
       case 'h2':
         this.chooseH2Route(this.selectedFilterByOption);
@@ -178,35 +171,36 @@ export class CarReportComponent {
         this.CsvGetAllBy(this.selectedFilterByOption);
         break;
       default:
-        this.displayErrorMessage("Invalid data source selected");
+        this.messageService.sendError("Invalid data source selected");
         break;
     }
   }
 
-
+  //decides which route is needed when doing a filterby query with the h2 database
   chooseH2Route(filterBy: string): void {
+    const filename = this.getFilterByFilename(filterBy)
     switch (filterBy) {
       case 'Make':
-        this.carDataDbService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-          this.selectedMake + " Cars"));
+        this.carDataDbService.getAllByMakeDB(this.selectedMake ? this.selectedMake : '', this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       case 'Year':
-        this.carDataDbService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-          this.selectedYear + " Cars"));
+        this.carDataDbService.getAllByYearDB(Number(this.selectedYear), this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       case 'Price':
-        this.carDataDbService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-          "Cars less than $" + this.priceFilter));
+        this.carDataDbService.getCarsLessThanDB(this.priceFilter, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(filename));
         break;
       default:
         break;
     }
   }
 
-  emptyFilterValue() {
+  //determine whether or not there's been a filter by value selection
+  emptyFilterValue(): boolean {
      return !(this.selectedMake || this.selectedYear || this.priceFilter)
   }
 
+  //FormData object for the combined csv filter-by method,
+  // using a parameter object instead of having seperate routes
   fillFormData(by: string): FormData {
     let formData = new FormData();
     formData.append('file', this.fileToUpload!);
@@ -236,7 +230,7 @@ export class CarReportComponent {
       formData.append('sort', this.selectedSortDirOption);
       this.carDataCsv.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
     } else {
-      this.displayErrorMessage('No file selected');
+      this.messageService.sendError("no file selected");
     }
   }
 
@@ -247,7 +241,7 @@ export class CarReportComponent {
       const formData = this.fillFormData(by);
       this.carDataCsv.getAllBy(formData).subscribe(this.getObserverForPdfDownload(fileName));
     } else {
-      this.displayErrorMessage('No file selected');
+      this.messageService.sendError('No file selected');
     }
   }
 
@@ -278,7 +272,7 @@ export class CarReportComponent {
     } else {
       this.carDataFs.groupBySaveToFs(formData).subscribe((data)=>{
         if (data.Success == 'true') {
-          this.displaySuccessMessage("File saved in: " + data.OutputPath, 7000);
+          this.messageService.sendSuccess({message:  "File saved in: " + data.OutputPath, timeout: 7000});
           this.fileLocationOnServer = data.OutputPath;
           setTimeout(()=>{
             this.fileLocationOnServer = null;
@@ -290,6 +284,8 @@ export class CarReportComponent {
 
   //OTHER DATABASE OPERATIONS
   deleteAllFromDb() {
+    this.clearFilterValues();
+    this.scrollToBottom()
     this.carDataDbService.deleteAllFromDb().subscribe({
       next: (response: any) => {
         console.log(response);
@@ -298,7 +294,7 @@ export class CarReportComponent {
         console.log('An error occurred:', error);
       },
       complete: () => {
-        this.displaySuccessMessage("All Data Deleted.")
+        this.messageService.sendSuccess({message:"All Data Deleted."})
         this.filterComponent.populateDBOptions()
       }
     });
@@ -306,44 +302,20 @@ export class CarReportComponent {
 
   //functions for filling and clearing select elements
   onSourceChange(newDatasourceVal: string) {
+    this.clearFilterValues();
     this.selectedDatasource = newDatasourceVal;
-    console.log("new ds: " + this.selectedDatasource)
-    if (newDatasourceVal == 'h2') {
-      this.fileToUpload = null;
-
-    }
-    if (newDatasourceVal == 'csv') {
-      this.fileToUpload = null;
-    }
-
+    this.fileToUpload = null;
     if (newDatasourceVal == 'fs') {
       this.isGroupSortActive = true;
+      this.isFilterActive = false;
     }
   }
 
-  //managing disable of inputs
-
-  onDbUploadSuccess(msg :string): void {
-    this.displaySuccessMessage(msg)
+  onDbUploadSuccess(): void {
     this.filterComponent.populateDBOptions();
   }
 
   //other
-  displayErrorMessage(message: string) {
-    this.errorMessage = message;
-    setTimeout(() => {
-      this.errorMessage = null;
-    }, 3000);
-    this.fileToUpload = null;
-  }
-
-  displaySuccessMessage(message: string, timeout: number = 3000) {
-    this.successMsg = message;
-    setTimeout(() => {
-      this.successMsg = null;
-    }, timeout);
-    this.fileToUpload = null;
-  }
 
   getObserverForPdfDownload(reportType: string) {
     return {
@@ -360,46 +332,15 @@ export class CarReportComponent {
       }
     }
   }
+  jiggle(button: HTMLElement): void {
+    button.classList.add('jiggle');
+    setTimeout(() => {
+      button.classList.remove('jiggle');
+    }, 200);  // This duration should match the animation's duration
+  }
+  scrollToBottom() {
+    window.scrollTo(0, document.body.scrollHeight);
+  }
 
 }
-
-
-// getAllByMakeCSV() {
-//   if (this.fileToUpload) {
-//     this.errorMessage = null;
-//     const formData: FormData = new FormData();
-//     formData.append('file', this.fileToUpload, this.fileToUpload.name);
-//     this.carDataDbService.getAllByMakeCSV(this.selectedMake ? this.selectedMake : '',formData, this.selectedDatasource).subscribe(this.getObserverForPdfDownload(
-//       this.selectedMake + " Cars"));
-//   } else {
-//     this.displayErrorMessage('No file selected');
-//   }
-// }
-//
-// getAllByYearCSV() {
-//   if (this.fileToUpload) {
-//     this.errorMessage = null;
-//     const formData: FormData = new FormData();
-//     formData.append('file', this.fileToUpload, this.fileToUpload.name);
-//     this.carDataDbService.getAllByYearCSV(Number(this.selectedYear),formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-//       this.selectedYear + " Cars"
-//     ));
-//   } else {
-//     this.displayErrorMessage('No file selected');
-//   }
-// }
-//
-// getAllLessThanCSV() {
-//   if (this.fileToUpload) {
-//     this.errorMessage = null;
-//     const formData: FormData = new FormData();
-//     formData.append('file', this.fileToUpload, this.fileToUpload.name);
-//     this.carDataDbService.getCarsLessThanCSV(this.priceFilter,formData, this.filterSortDirOption).subscribe(this.getObserverForPdfDownload(
-//       "Cars < $" + this.priceFilter));
-//   } else {
-//     this.displayErrorMessage('No file selected');
-//   }
-// }
-
-
 

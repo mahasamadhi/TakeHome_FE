@@ -9,6 +9,7 @@ import { FilterComponent } from './filter/filter.component';
 import {CarReportComponent} from "./car-report/car-report.component";
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { ReportFormComponent } from './report-form/report-form.component';
+import { MessageComponent } from './message/message.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,9 @@ import { ReportFormComponent } from './report-form/report-form.component';
     FilterComponent,
     CarReportComponent,
     FileUploadComponent,
-    ReportFormComponent
+    ReportFormComponent,
+    MessageComponent,
+    MessageComponent
   ],
   imports: [
     BrowserModule,

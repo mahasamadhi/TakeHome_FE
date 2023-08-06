@@ -3,7 +3,7 @@
 
 </div>
 <div class="container">
-
+<!-- SELECT ELEMENT TO CHOOSE DATASOURCE, DRIVING THE REST OF THE FUNCTIONALITY-->
     <div class="chooseDatasource-container">
       <h2>Choose your datasource</h2>
       <div class="flexColumn">
@@ -13,10 +13,10 @@
           <option value="fs">Server Filesystem</option>
         </select>
       </div>
-
     </div>
 
   <div class="flexRow">
+<!--    RADIO BUTTONS FOR FILESYSTEM DATASOURCE-->
 <div *ngIf="selectedDatasource == 'fs'" class="flexRow">
   <input type="radio" id="download" name="outputOption" checked="true" value="download" [(ngModel)]="fsOutputType">
   <label for="download">Download PDF</label><br>
@@ -27,20 +27,17 @@
     <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All</button>
   </div>
 
+<!--    FILE UPLOAD INPUT THAT IS USED IN CSV AND DB OPTIONS-->
   <app-file-upload
     [selectedDatasource]="selectedDatasource"
     (fileInputChange)="handleFileInput($event)"
-    (errorMsg)="displayErrorMessage($event)"
-    (uploadToDbSuccess)="onDbUploadSuccess($event)"
+    (uploadToDbSuccess)="onDbUploadSuccess()"
     (showSubmitToDbButton)="onShowSubmitToDb($event)"
   ></app-file-upload>
-
   </div>
 
 
-
-
-  <div style="display: flex;flex-direction: row;justify-content: space-evenly; gap: 30px;">
+  <div id="groupFilterContainer">
   <app-group
     [isGroupActive]="isGroupSortActive"
     (selectedGroupByOptionChange)="handleGroupByOptionChange($event)"
@@ -48,40 +45,40 @@
     (groupButtonClick)="onGroupSortButtonClick()"
   ></app-group>
 
-<app-filter *ngIf="selectedDatasource != 'fs'"
-  [isFilterActive]="isFilterActive"
-  [selectedDatasource]="selectedDatasource"
-            [fileToUpload]="fileToUpload"
-  (filterButtonClick)="onFilterButtonClick($event)"
-            (errorMsg)="displayErrorMessage($event)"
-  (selectedFilterByOptionChange)="onSelectedFilterByOptionChange($event)"
-  (selectedMakeChange)="onSelectedMakeChange($event)"
-  (selectedYearChange)="onSelectedYearChange($event)"
-  (priceFilterChange)="onPriceFilterChange($event)">
-
-  >
-
-
-</app-filter>
-
+  <app-filter
+    *ngIf="selectedDatasource != 'fs'"
+    [isFilterActive]="isFilterActive"
+    [selectedDatasource]="selectedDatasource"
+    [fileToUpload]="fileToUpload"
+    (filterButtonClick)="onFilterButtonClick()"
+    (selectedFilterByOptionChange)="onSelectedFilterByOptionChange($event)"
+    (selectedMakeChange)="onSelectedMakeChange($event)"
+    (selectedYearChange)="onSelectedYearChange($event)"
+    (priceFilterChange)="onPriceFilterChange($event)">>
+  </app-filter>
   </div>
 
-
-
+<!--  A BUTTON FOR EACH OF THE 2 REPORT TYPES-->
   <div style="margin-top: 30px;">
     <button *ngIf="isGroupSortActive" #btn id="submitGroupButton"   [style.opacity]="groupByReady() ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest();"><h1>Submit Request</h1></button>
     <button *ngIf="isFilterActive"  id="submitFilterButton"  [style.opacity]="groupByReady() ? '1' : '0.4'" style="background-color: darkgreen" class="button" (click)="submitFilterRequest()"><h1>Submit Request</h1></button>
   </div>
 
+<!--  ERROR AND SUCCESS MESSAGE SPACE-->
   <div class="message-space">
-
     <span class="error" *ngIf="errorMessage">{{ errorMessage }}</span>
     <div class="success" *ngIf="successMsg">
       <p>{{ successMsg }}</p>
     </div>
-    <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
-
 
   </div>
+
+  <div class="flexRow">
+
+  <app-message></app-message>
+
+  <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
+  </div>
+
 
 </div>
