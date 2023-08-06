@@ -228,7 +228,8 @@ export class CarReportComponent {
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       formData.append('groupBy', this.selectedGroupByOption);
       formData.append('sort', this.selectedSortDirOption);
-      this.carDataCsv.groupByParameterCSV(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
+      this.carDataCsv.groupByParameterCSV(formData).subscribe(
+        this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
     } else {
       this.messageService.sendError("no file selected");
     }
@@ -329,6 +330,7 @@ export class CarReportComponent {
       },
       complete: () => {
         console.log('Request completed');
+        this.messageService.sendSuccess({message:"Success!"});
       }
     }
   }
