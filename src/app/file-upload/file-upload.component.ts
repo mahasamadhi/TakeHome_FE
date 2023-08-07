@@ -25,16 +25,18 @@ export class FileUploadComponent {
   handleFileInput(event: Event) {
     const target = event.target as HTMLInputElement;
     const files = target.files;
-    if (files && files.length > 0) {
-      this.fileToUpload = files.item(0);
-      if (this.fileToUpload) {
-        this.fileInputChange.emit(this.fileToUpload);
-      } else {
-        console.log('No file selected');
-      }
-    } else {
+    if (!files || files.length === 0) {
       console.log('No files available');
+      return
+      }
+    const file = files.item(0)!;
+    if (file.type != 'text/csv') {
+      target.value = ''
+      this.messageService.sendError("Unsupported Filetype. Accepts only CSV with car details ")
+      return
     }
+    this.fileToUpload = file
+    this.fileInputChange.emit(this.fileToUpload!);
   }
 
   cancelUpload() {
