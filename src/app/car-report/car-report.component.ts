@@ -18,7 +18,6 @@ export class CarReportComponent {
 
   @ViewChild(FilterComponent) filterComponent!: FilterComponent;
   //file
-  fileInputEl: HTMLInputElement | null = null;
   fileToUpload: File | null = null;
 
 
