@@ -42,7 +42,7 @@ export class FilterComponent {
   }
 
   handleDatasourceChanges() {
-    this.clearOptions();
+    this.clearSelectOptions();
     if (this.selectedDatasource == 'h2') {
       this.populateDBOptions();
     }
@@ -105,9 +105,14 @@ export class FilterComponent {
     }
   }
 
-  clearOptions() {
+  clearSelectOptions() {
     this.makeOptions = [];
     this.yearOptions = [];
+  }
+
+  clearChoices() {
+    this.selectedMake = "";
+    this.selectedYear = "";
     this.priceFilter = 0;
   }
 

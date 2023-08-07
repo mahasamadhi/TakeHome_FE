@@ -91,7 +91,7 @@ export class CarReportComponent {
   }
 
   onSelectedFilterByOptionChange(value: string) {
-    this.clearFilterValues();
+    this.clearFilterChoices()
     this.selectedFilterByOption = value;
   }
 
@@ -291,7 +291,14 @@ export class CarReportComponent {
 
   // clears all selected and populated values within the filter component
   clearFilterValues() {
-    this.filterComponent.clearOptions();
+    this.filterComponent.clearSelectOptions();
+    this.priceFilter = 0
+    this.selectedYear =  null;
+    this.selectedMake = null;
+  }
+
+  clearFilterChoices() {
+    this.filterComponent.clearChoices();
     this.priceFilter = 0
     this.selectedYear =  null;
     this.selectedMake = null;
