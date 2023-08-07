@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/co
 import {CarDataDbService} from "../services/car-data-db.service";
 import {CarDataCsvService} from "../services/car-data-csv.service";
 import {MessageService} from "../services/message.service";
+import {saveAs} from "file-saver";
 
 @Component({
   selector: 'app-filter',
@@ -60,6 +61,7 @@ export class FilterComponent {
 
   //populate the select elements for year/make
   populateDBOptions() {
+    this.clearSelectOptions();
     this.populateMakeOptions();
     this.populateYearOptions();
   }
@@ -69,8 +71,19 @@ export class FilterComponent {
       if (this.fileToUpload) {
         const formData: FormData = new FormData();
         formData.append('file', this.fileToUpload!, this.fileToUpload!.name);
-        this.csvData.getCSVDBMakeOptions(formData).subscribe((data)=>{
-          this.makeOptions = data.makeOptions;
+        this.csvData.getCSVDBMakeOptions(formData).subscribe({
+          next: (response: any) => {
+            this.makeOptions = response.makeOptions;
+            this.messageService.sendSuccess({message:"File Successfully Parsed"});
+          },
+          error: (error: any) => {
+            this.fileToUpload = null;
+            this.messageService.sendError("Error while parsing CSV file, check for proper format")
+            console.log('An error occurred:', error);
+          },
+          complete: () => {
+            console.log('Request completed');
+          }
         })
       } else {
         this.messageService.sendError('Error: no file selected');
@@ -90,9 +103,21 @@ export class FilterComponent {
       if (this.fileToUpload) {
         const formData: FormData = new FormData();
         formData.append('file', this.fileToUpload!,this.fileToUpload!.name);
-        this.csvData.getCSVYearOptions(formData).subscribe((data)=>{
-          this.yearOptions = data.yearOptions;
-        })
+        this.csvData.getCSVYearOptions(formData).subscribe(
+          {
+            next: (response: any) => {
+              this.yearOptions = response.yearOptions;
+              this.messageService.sendSuccess({message:"File Successfully Parsed"});
+            },
+            error: (error: any) => {
+              this.fileToUpload = null;
+              this.messageService.sendError("Error while parsing CSV file, check for proper format")
+              console.log('An error occurred:', error);
+            },
+            complete: () => {
+              console.log('Request completed');
+            }
+          })
       } else {
         this.messageService.sendError('Error: no file selected') ;
       }

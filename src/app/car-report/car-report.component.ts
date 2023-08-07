@@ -345,6 +345,7 @@ export class CarReportComponent {
         saveAs(blob, Filename);
       },
       error: (error: any) => {
+        this.fileToUpload = null;
         console.log('An error occurred:', error);
       },
       complete: () => {
