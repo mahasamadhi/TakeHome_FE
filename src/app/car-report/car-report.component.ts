@@ -20,37 +20,41 @@ export class CarReportComponent {
   //file
   fileInputEl: HTMLInputElement | null = null;
   fileToUpload: File | null = null;
+
+
   //messages
   errorMessage: string | null = null;
   successMsg: string | null = null;
 
-  //to toggle submit button for adding csv to database
-  showSubmitToDb: boolean = false;
 
-  //when FS datasource, the location of the file that was downlaoded
-  fileLocationOnServer: string | null = null;
 
   //Filter Parameters
   selectedMake: string | null = null;
   selectedYear: string | null = null;
   selectedFilterByOption: string = 'Make';
-  selectedGroupByOption: string = 'Year';
   priceFilter: number = 0;
+
 
   //Group and Sort Parameters
   selectedSortDirOption: string = 'asc';
-
   // for managing the status of the filter and group by sections
   isGroupSortActive: boolean = true;
   isFilterActive: boolean = false;
+  selectedGroupByOption: string = 'Year';
 
-  //RADIO BUTTON BINDING FOR FILESYSTEM REPORT
 
-  fsOutputType: string = 'download';
+  //to toggle submit button for adding csv to database
+  showSubmitToDb: boolean = false;
+
+  //Filesystem
+
+    //radio button binding for filesystem report
+    fsOutputType: string = 'download';
+    //when FS datasource, the location of the file that was downlaoded
+    fileLocationOnServer: string | null = null;
 
   //choosing datasource
   selectedDatasource: string = 'csv';
-
 
   constructor(
     private http: HttpClient,
@@ -69,7 +73,6 @@ export class CarReportComponent {
   handleGroupByOptionChange(groupByOption: string): void {
     this.selectedGroupByOption = groupByOption;
   }
-
   handleSortDirOptionChange(sortDirOption: string): void {
     this.selectedSortDirOption = sortDirOption;
     if (this.groupByReady()) {
@@ -77,25 +80,11 @@ export class CarReportComponent {
     }
 
   }
-
-  groupByReady() {
-    return (this.fileToUpload || this.selectedDatasource =='h2' || this.selectedDatasource == 'fs')
-  }
-
   handleFileInput(file: File) {
     this.fileToUpload = file;
   }
   //from filter child component
 
-  onFilterButtonClick(): void {
-      this.isGroupSortActive = false;
-      this.isFilterActive = true;
-  }
-
-  onGroupSortButtonClick(): void {
-    this.isGroupSortActive = true;
-    this.isFilterActive = false;
-  }
 
   onShowSubmitToDb(val : boolean): void {
     this.showSubmitToDb = val;
@@ -104,13 +93,6 @@ export class CarReportComponent {
   onSelectedFilterByOptionChange(value: string) {
     this.clearFilterValues();
     this.selectedFilterByOption = value;
-  }
-
-  clearFilterValues() {
-    this.filterComponent.clearOptions();
-    this.priceFilter = 0
-    this.selectedYear =  null;
-    this.selectedMake = null;
   }
 
   onSelectedMakeChange(value: string) {
@@ -127,6 +109,19 @@ export class CarReportComponent {
   onPriceFilterChange(value: number) {
   this.priceFilter = value;
   }
+
+//STARTING POINT OF APP FLOW
+  onSourceChange(newDatasourceVal: string) {
+    this.clearFilterValues();
+    this.selectedDatasource = newDatasourceVal;
+    this.fileToUpload = null;
+    if (newDatasourceVal == 'fs') {
+      this.isGroupSortActive = true;
+      this.isFilterActive = false;
+    }
+  }
+
+//MAIN FUNCTIONALITY
 
   submitGroupRequest() {
     this.scrollToBottom()
@@ -195,8 +190,56 @@ export class CarReportComponent {
   }
 
   //determine whether or not there's been a filter by value selection
-  emptyFilterValue(): boolean {
-     return !(this.selectedMake || this.selectedYear || this.priceFilter)
+
+
+//GROUP BY
+
+  //FormData object follows 'ReportOptions' pojo in backend
+  CSVGroupBy() {
+    if (this.fileToUpload) {
+      this.errorMessage = null;
+      const formData: FormData = new FormData();
+      formData.append('file', this.fileToUpload, this.fileToUpload.name);
+      formData.append('groupBy', this.selectedGroupByOption);
+      formData.append('sort', this.selectedSortDirOption);
+      this.carDataCsv.groupByParameterCSV(formData).subscribe(
+        this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
+    } else {
+      this.messageService.sendError("no file selected");
+    }
+  }
+
+  FsGroupBy() {
+    const formData: FormData = new FormData();
+    formData.append('groupBy', this.selectedGroupByOption);
+    formData.append('sort', this.selectedSortDirOption);
+    formData.append('outputType', this.fsOutputType)
+
+    if (this.fsOutputType == 'download') {
+      this.carDataFs.groupByDownload(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
+    } else {
+      this.carDataFs.groupBySaveToFs(formData).subscribe((data)=>{
+        if (data.Success == 'true') {
+          this.messageService.sendSuccess({message:  "File saved in: " + data.OutputPath, timeout: 7000});
+          this.fileLocationOnServer = data.OutputPath;
+          setTimeout(()=>{
+            this.fileLocationOnServer = null;
+          },7000)
+        }
+      })
+    }
+  }
+  //GET ALL BY
+
+  CsvGetAllBy(by: string) {
+    if (this.fileToUpload) {
+      let fileName = this.getFilterByFilename(by)
+      this.errorMessage = null;
+      const formData = this.fillFormData(by);
+      this.carDataCsv.getAllBy(formData).subscribe(this.getObserverForPdfDownload(fileName));
+    } else {
+      this.messageService.sendError('No file selected');
+    }
   }
 
   //FormData object for the combined csv filter-by method,
@@ -218,70 +261,8 @@ export class CarReportComponent {
     return formData;
   }
 
-//CSV TO PDF
 
-  //FormData object follows 'ReportOptions' pojo in backend
-  CSVGroupBy() {
-    if (this.fileToUpload) {
-      this.errorMessage = null;
-      const formData: FormData = new FormData();
-      formData.append('file', this.fileToUpload, this.fileToUpload.name);
-      formData.append('groupBy', this.selectedGroupByOption);
-      formData.append('sort', this.selectedSortDirOption);
-      this.carDataCsv.groupByParameterCSV(formData).subscribe(
-        this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
-    } else {
-      this.messageService.sendError("no file selected");
-    }
-  }
 
-  CsvGetAllBy(by: string) {
-    if (this.fileToUpload) {
-      let fileName = this.getFilterByFilename(by)
-      this.errorMessage = null;
-      const formData = this.fillFormData(by);
-      this.carDataCsv.getAllBy(formData).subscribe(this.getObserverForPdfDownload(fileName));
-    } else {
-      this.messageService.sendError('No file selected');
-    }
-  }
-
-  //get the pdf filename for filter by queries
-  getFilterByFilename(by:string): string {
-    let fileName = "";
-    if (by == 'Price') {
-      fileName = "Cars less than $" + this.priceFilter;
-    }
-    if (by == 'Make') {
-      fileName = this.selectedMake + " Cars"
-    }
-    if (by == 'Year') {
-      fileName = this.selectedYear + " Cars"
-    }
-    return fileName;
-  }
-
-  //file system group by
-  FsGroupBy() {
-      const formData: FormData = new FormData();
-      formData.append('groupBy', this.selectedGroupByOption);
-      formData.append('sort', this.selectedSortDirOption);
-      formData.append('outputType', this.fsOutputType)
-
-    if (this.fsOutputType == 'download') {
-      this.carDataFs.groupByDownload(formData).subscribe(this.getObserverForPdfDownload("Cars_by_" + this.selectedGroupByOption))
-    } else {
-      this.carDataFs.groupBySaveToFs(formData).subscribe((data)=>{
-        if (data.Success == 'true') {
-          this.messageService.sendSuccess({message:  "File saved in: " + data.OutputPath, timeout: 7000});
-          this.fileLocationOnServer = data.OutputPath;
-          setTimeout(()=>{
-            this.fileLocationOnServer = null;
-          },7000)
-        }
-      })
-    }
-  }
 
   //OTHER DATABASE OPERATIONS
   deleteAllFromDb() {
@@ -301,23 +282,54 @@ export class CarReportComponent {
     });
   }
 
-  //functions for filling and clearing select elements
-  onSourceChange(newDatasourceVal: string) {
-    this.clearFilterValues();
-    this.selectedDatasource = newDatasourceVal;
-    this.fileToUpload = null;
-    if (newDatasourceVal == 'fs') {
-      this.isGroupSortActive = true;
-      this.isFilterActive = false;
-    }
-  }
-
   onDbUploadSuccess(): void {
     this.filterComponent.populateDBOptions();
   }
 
-  //other
+  // helpers and UI state
 
+
+  // clears all selected and populated values within the filter component
+  clearFilterValues() {
+    this.filterComponent.clearOptions();
+    this.priceFilter = 0
+    this.selectedYear =  null;
+    this.selectedMake = null;
+  }
+
+  //get the pdf filename for filter-by queries
+  getFilterByFilename(by:string): string {
+    let fileName = "";
+    if (by == 'Price') {
+      fileName = "Cars less than $" + this.priceFilter;
+    }
+    if (by == 'Make') {
+      fileName = this.selectedMake + " Cars"
+    }
+    if (by == 'Year') {
+      fileName = this.selectedYear + " Cars"
+    }
+    return fileName;
+  }
+
+  emptyFilterValue(): boolean {
+    return !(this.selectedMake || this.selectedYear || this.priceFilter)
+  }
+  groupByReady() {
+    return (this.fileToUpload || this.selectedDatasource =='h2' || this.selectedDatasource == 'fs')
+  }
+
+  onFilterButtonClick(): void {
+    this.isGroupSortActive = false;
+    this.isFilterActive = true;
+  }
+
+  onGroupSortButtonClick(): void {
+    this.isGroupSortActive = true;
+    this.isFilterActive = false;
+  }
+
+  //observer object used by all flows that return a pdf to the user
   getObserverForPdfDownload(reportType: string) {
     return {
       next: (response: any) => {
@@ -334,6 +346,10 @@ export class CarReportComponent {
       }
     }
   }
+
+  //other
+
+
   jiggle(button: HTMLElement): void {
     button.classList.add('jiggle');
     setTimeout(() => {

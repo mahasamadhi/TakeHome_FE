@@ -3,6 +3,7 @@
 
 </div>
 <div class="container">
+
 <!-- SELECT ELEMENT TO CHOOSE DATASOURCE, DRIVING THE REST OF THE FUNCTIONALITY-->
     <div class="chooseDatasource-container">
       <h2>Choose your datasource</h2>
@@ -16,7 +17,8 @@
     </div>
 
   <div class="flexRow">
-<!--    RADIO BUTTONS FOR FILESYSTEM DATASOURCE-->
+
+<!--    radio buttons for filesystem datasource-->
 <div *ngIf="selectedDatasource == 'fs'" class="flexRow">
   <input type="radio" id="download" name="outputOption" checked="true" value="download" [(ngModel)]="fsOutputType">
   <label for="download">Download PDF</label><br>
@@ -27,7 +29,7 @@
     <button style="width: 100px;" class="button" (click)="deleteAllFromDb()">Delete All</button>
   </div>
 
-<!--    FILE UPLOAD INPUT THAT IS USED IN CSV AND DB OPTIONS-->
+<!--    file-upload component, used in vsc and db options-->
   <app-file-upload
     [selectedDatasource]="selectedDatasource"
     (fileInputChange)="handleFileInput($event)"
@@ -36,7 +38,7 @@
   ></app-file-upload>
   </div>
 
-
+<!--  the group-by and filter-by sections-->
   <div id="groupFilterContainer">
   <app-group
     [isGroupActive]="isGroupSortActive"
@@ -58,6 +60,7 @@
   </app-filter>
   </div>
 
+
 <!--  A BUTTON FOR EACH OF THE 2 REPORT TYPES-->
   <div style="margin-top: 30px;">
     <button *ngIf="isGroupSortActive" #btn id="submitGroupButton"   [style.opacity]="groupByReady() ? '1' : '0.4'"  style="background-color: darkgreen" class="button" (click)="submitGroupRequest();"><h1>Submit Request</h1></button>
@@ -70,13 +73,13 @@
     <div class="success" *ngIf="successMsg">
       <p>{{ successMsg }}</p>
     </div>
-
   </div>
 
+<!--  A space to display error and success messages-->
   <div class="flexRow">
-
-  <app-message></app-message>
-
+  <app-message>
+  </app-message>
+<!--    A button to copy the displayed filepath upon save to filesystem-->
   <button *ngIf="selectedDatasource == 'fs' && fileLocationOnServer" id="copyButton" class="button" [attr.data-clipboard-text]="fileLocationOnServer">Copy</button>
   </div>
 

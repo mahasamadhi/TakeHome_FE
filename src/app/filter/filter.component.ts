@@ -29,6 +29,9 @@ export class FilterComponent {
   priceFilter = 0;
   constructor( private dbData: CarDataDbService, private  csvData: CarDataCsvService, private messageService: MessageService) { }
 
+  //Handling when the input variables have changes from the parent
+
+  //Alternative design: use a service with a behavior subject
   ngOnChanges(changes: SimpleChanges) {
     if (changes['selectedDatasource']) {
       this.handleDatasourceChanges()
@@ -55,6 +58,7 @@ export class FilterComponent {
       this.filterButtonClick.emit("");
   }
 
+  //populate the select elements for year/make
   populateDBOptions() {
     this.populateMakeOptions();
     this.populateYearOptions();
