@@ -22,12 +22,6 @@ export class CarReportComponent {
   fileToUpload: File | null = null;
 
 
-  //messages
-  errorMessage: string | null = null;
-  successMsg: string | null = null;
-
-
-
   //Filter Parameters
   selectedMake: string | null = null;
   selectedYear: string | null = null;
@@ -197,7 +191,6 @@ export class CarReportComponent {
   //FormData object follows 'ReportOptions' pojo in backend
   CSVGroupBy() {
     if (this.fileToUpload) {
-      this.errorMessage = null;
       const formData: FormData = new FormData();
       formData.append('file', this.fileToUpload, this.fileToUpload.name);
       formData.append('groupBy', this.selectedGroupByOption);
@@ -234,7 +227,6 @@ export class CarReportComponent {
   CsvGetAllBy(by: string) {
     if (this.fileToUpload) {
       let fileName = this.getFilterByFilename(by)
-      this.errorMessage = null;
       const formData = this.fillFormData(by);
       this.carDataCsv.getAllBy(formData).subscribe(this.getObserverForPdfDownload(fileName));
     } else {
